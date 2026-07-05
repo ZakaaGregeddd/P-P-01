@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ARCHITEX.v1 - Certificate Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Space+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        @layer utilities {
+            .glass-panel {
+                @apply bg-tertiary/5 backdrop-blur-[12px] border border-outline/30 relative overflow-hidden;
+            }
+            .glass-panel::before {
+                 content: '';
+                 position: absolute;
+                 top: 0;
+                 left: 0;
+                 right: 0;
+                 bottom: 0;
+                 background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,112,255,0.02) 100%);
+                 pointer-events: none;
+                 z-index: 0;
+            }
+            .glow-effect:hover {
+                @apply shadow-[0_0_20px_rgba(0,112,255,0.4)];
+            }
+            .glow-text {
+                text-shadow: 0 0 10px rgba(0,112,255,0.5);
+            }
+            .blueprint-grid {
+                background-image: linear-gradient(to right, rgba(0, 112, 255, 0.15) 1px, transparent 1px),
+                                  linear-gradient(to bottom, rgba(0, 112, 255, 0.15) 1px, transparent 1px);
+                background-size: 8px 8px;
+            }
+            .blueprint-grid-lg {
+                background-image: linear-gradient(to right, rgba(0, 112, 255, 0.15) 1px, transparent 1px),
+                                  linear-gradient(to bottom, rgba(0, 112, 255, 0.15) 1px, transparent 1px);
+                background-size: 64px 64px;
+            }
+            .dimension-line {
+                @apply relative w-full h-[1px] bg-secondary/30;
+            }
+            .dimension-line::before, .dimension-line::after {
+                content: '';
+                @apply absolute top-1/2 -translate-y-1/2 w-[4px] h-[4px] bg-secondary rotate-45;
+            }
+            .dimension-line::before { @apply left-0; }
+            .dimension-line::after { @apply right-0; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#93000a",
+                        "tertiary-fixed": "#e5e2e1",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-background": "#e5e2e1",
+                        "error": "#ffb4ab",
+                        "on-secondary-container": "#002661",
+                        "secondary": "#b0c6ff",
+                        "on-secondary": "#002d6f",
+                        "on-primary-fixed": "#1a1c1c",
+                        "surface-bright": "#393939",
+                        "on-tertiary-container": "#656464",
+                        "surface-container": "#20201f",
+                        "secondary-fixed": "#d9e2ff",
+                        "primary-fixed": "#e2e2e2",
+                        "primary-container": "#e2e2e2",
+                        "on-tertiary-fixed-variant": "#474646",
+                        "background": "#131313",
+                        "tertiary": "#ffffff",
+                        "surface-variant": "#353535",
+                        "surface": "#131313",
+                        "surface-container-high": "#2a2a2a",
+                        "on-secondary-fixed-variant": "#00429c",
+                        "on-primary": "#2f3131",
+                        "primary": "#ffffff",
+                        "on-surface": "#e5e2e1",
+                        "surface-container-highest": "#353535",
+                        "outline-variant": "#444748",
+                        "tertiary-container": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "on-secondary-fixed": "#001945",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "inverse-primary": "#5d5f5f",
+                        "surface-tint": "#c6c6c7",
+                        "outline": "#8e9192",
+                        "tertiary-fixed-dim": "#c9c6c5",
+                        "secondary-fixed-dim": "#b0c6ff",
+                        "on-tertiary": "#313030",
+                        "surface-container-low": "#1c1b1b",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "inverse-on-surface": "#313030",
+                        "secondary-container": "#568dff",
+                        "on-surface-variant": "#c4c7c8",
+                        "on-primary-fixed-variant": "#454747",
+                        "on-primary-container": "#636565",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "margin-desktop": "64px",
+                        "max-width": "1440px",
+                        "grid-unit": "8px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-base": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "technical-sm": ["Space Mono"],
+                        "label-caps": ["Space Mono"],
+                        "display-lg-mobile": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "display-lg": ["72px", {"lineHeight": "80px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "technical-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "400"}],
+                        "label-caps": ["10px", {"lineHeight": "12px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-base min-h-screen relative overflow-x-hidden blueprint-grid">
+<!-- Base Blueprint Grid for large scale -->
+<div class="fixed inset-0 blueprint-grid-lg pointer-events-none opacity-50 z-[-1]"></div>
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-secondary/20 shadow-[0_0_20px_rgba(86,141,255,0.15)] transition-all duration-300 ease-out hidden md:block">
+<div class="flex justify-between items-center px-margin-desktop h-20 max-w-max-width mx-auto">
+<div class="font-display-lg text-headline-md tracking-tighter text-primary">ARCHITEX.v1</div>
+<div class="flex space-x-8 font-label-caps text-label-caps">
+<a class="text-on-surface-variant hover:text-primary hover:bg-primary/5 hover:shadow-[0_0_15px_rgba(86,141,255,0.3)] transition-colors p-2 rounded" href="#">Home</a>
+<a class="text-primary border-b border-primary pb-1 p-2 rounded" href="#">Certificates</a>
+<a class="text-on-surface-variant hover:text-primary hover:bg-primary/5 hover:shadow-[0_0_15px_rgba(86,141,255,0.3)] transition-colors p-2 rounded" href="#">Projects</a>
+<a class="text-on-surface-variant hover:text-primary hover:bg-primary/5 hover:shadow-[0_0_15px_rgba(86,141,255,0.3)] transition-colors p-2 rounded" href="#">Settings</a>
+</div>
+<button class="font-label-caps text-label-caps text-on-surface-variant border border-outline-variant px-4 py-2 rounded hover:text-primary hover:border-primary transition-all">Contact</button>
+</div>
+</nav>
+<!-- Main Layout -->
+<div class="flex pt-[80px] min-h-screen max-w-max-width mx-auto">
+<!-- Content Area -->
+<main class="flex-1 px-margin-mobile md:px-margin-desktop py-8 md:py-12">
+<!-- Header -->
+<header class="mb-12 relative">
+<div class="absolute -left-4 top-2 bottom-2 w-[1px] bg-secondary/50 hidden md:block"></div>
+<p class="font-technical-sm text-technical-sm text-secondary mb-2 tracking-widest glow-text">SYSTEM.ADMIN // CERT_MGMT_v04</p>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Certificate Management</h1>
+<div class="dimension-line mt-6 max-w-md hidden md:block"></div>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Input Section: Add New Certificate -->
+<div class="lg:col-span-5 flex flex-col gap-6">
+<div class="glass-panel rounded-lg p-6 glow-effect transition-all duration-300">
+<div class="flex items-center justify-between mb-6 border-b border-outline/30 pb-4 relative z-10">
+<h2 class="font-technical-sm text-technical-sm text-primary tracking-wider">INPUT_NODE // ADD_CERT</h2>
+<span class="material-symbols-outlined text-secondary text-sm">add_circle</span>
+</div>
+<form class="space-y-6 relative z-10">
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block">CERTIFICATE_NAME</label>
+<input class="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" placeholder="e.g. Advanced Structural Eng" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block">ISSUING_ORG</label>
+<input class="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" placeholder="e.g. AIA" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block">DATE_ISSUED</label>
+<input class="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" type="date"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block">CREDENTIAL_ID</label>
+<input class="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" placeholder="ID-XXXX-YYYY" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block">ASSET_UPLOAD</label>
+<div class="border-2 border-dashed border-outline/50 rounded-lg p-8 text-center hover:border-secondary/70 hover:bg-secondary/5 transition-all cursor-pointer flex flex-col items-center justify-center gap-2">
+<span class="material-symbols-outlined text-secondary opacity-70">cloud_upload</span>
+<span class="font-technical-sm text-technical-sm text-on-surface-variant block">Drop schematic file here or click to browse</span>
+<span class="font-label-caps text-label-caps text-outline-variant block mt-2">SUPPORTS: PDF, PNG, JPG (MAX 5MB)</span>
+</div>
+</div>
+<div class="pt-4 border-t border-outline/30 flex justify-end gap-4">
+<button class="font-technical-sm text-technical-sm text-on-surface-variant px-4 py-2 border border-outline/50 rounded hover:text-primary hover:border-primary transition-all" type="button">CANCEL</button>
+<button class="font-technical-sm text-technical-sm text-surface bg-secondary px-6 py-2 rounded hover:shadow-[0_0_15px_rgba(176,198,255,0.5)] transition-all font-bold" type="button">EXECUTE_SAVE</button>
+</div>
+</form>
+</div>
+</div>
+<!-- Table Section: Recent Certificates -->
+<div class="lg:col-span-7 flex flex-col gap-6 mt-8 lg:mt-0">
+<div class="glass-panel rounded-lg p-0 glow-effect transition-all duration-300 h-full flex flex-col">
+<div class="p-6 border-b border-outline/30 flex items-center justify-between relative z-10 bg-surface/40 backdrop-blur-sm">
+<h2 class="font-technical-sm text-technical-sm text-primary tracking-wider">DATA_TABLE // RECENT_CERTS</h2>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline-variant text-sm hover:text-primary cursor-pointer transition-colors">filter_list</span>
+<span class="material-symbols-outlined text-outline-variant text-sm hover:text-primary cursor-pointer transition-colors">more_vert</span>
+</div>
+</div>
+<div class="overflow-x-auto relative z-10 flex-1">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline/30 bg-surface-container/30">
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant font-normal">CERTIFICATE</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant font-normal hidden md:table-cell">ORG</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant font-normal">STATUS</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant font-normal text-right">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="font-technical-sm text-technical-sm text-on-surface divide-y divide-outline/20">
+<!-- Row 1 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="p-4">
+<div class="text-primary font-bold">LEED AP BD+C</div>
+<div class="text-outline-variant text-[10px] mt-1">ID: L-2023-9981</div>
+</td>
+<td class="p-4 hidden md:table-cell text-on-surface-variant">USGBC</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1 text-[10px] text-secondary border border-secondary/30 px-2 py-1 rounded bg-secondary/10">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_5px_rgba(176,198,255,0.8)]"></span> ACTIVE
+                                            </span>
+</td>
+<td class="p-4 text-right">
+<div class="flex justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-secondary transition-colors"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+<button class="p-1 hover:text-error transition-colors"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="p-4">
+<div class="text-primary font-bold">Autodesk Revit Certified Pro</div>
+<div class="text-outline-variant text-[10px] mt-1">ID: ADSK-R-4421</div>
+</td>
+<td class="p-4 hidden md:table-cell text-on-surface-variant">Autodesk</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1 text-[10px] text-secondary border border-secondary/30 px-2 py-1 rounded bg-secondary/10">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_5px_rgba(176,198,255,0.8)]"></span> ACTIVE
+                                            </span>
+</td>
+<td class="p-4 text-right">
+<div class="flex justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-secondary transition-colors"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+<button class="p-1 hover:text-error transition-colors"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="p-4">
+<div class="text-primary font-bold">OSHA 30-Hour Construction</div>
+<div class="text-outline-variant text-[10px] mt-1">ID: OSH-30-X992</div>
+</td>
+<td class="p-4 hidden md:table-cell text-on-surface-variant">OSHA</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1 text-[10px] text-outline border border-outline/30 px-2 py-1 rounded bg-outline/10">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span> EXPIRED
+                                            </span>
+</td>
+<td class="p-4 text-right">
+<div class="flex justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-secondary transition-colors"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+<button class="p-1 hover:text-error transition-colors"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-outline/30 bg-surface/40 backdrop-blur-sm relative z-10 flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-outline-variant">TOTAL_RECORDS: 03</span>
+<div class="flex gap-2">
+<button class="p-1 border border-outline/30 rounded hover:bg-primary/10 transition-colors text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">chevron_left</span></button>
+<button class="p-1 border border-outline/30 rounded hover:bg-primary/10 transition-colors text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="w-full py-8 bg-background border-t border-outline-variant/30 flat flex flex-col md:flex-row justify-between items-center px-margin-desktop gap-4 z-10 relative">
+<div class="font-label-caps text-label-caps text-primary">ARCHITEX.v1</div>
+<div class="font-technical-sm text-technical-sm text-on-surface-variant opacity-80 hover:opacity-100 transition-opacity">
+            © 2024 SYSTEM_REDACTED. ARCHITECTURAL SPECIFICATION V.04
+        </div>
+<div class="flex space-x-6 font-technical-sm text-technical-sm text-on-surface-variant">
+<a class="hover:text-secondary transition-colors" href="#">Documentation</a>
+<a class="hover:text-secondary transition-colors" href="#">Source</a>
+<a class="hover:text-secondary transition-colors" href="#">Privacy</a>
+</div>
+</footer>
+</body></html>

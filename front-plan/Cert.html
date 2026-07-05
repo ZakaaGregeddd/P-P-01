@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Certificates - ARCHITEX.v1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface-variant": "#c4c7c8",
+                      "tertiary": "#ffffff",
+                      "tertiary-container": "#e5e2e1",
+                      "primary-fixed-dim": "#c6c6c7",
+                      "inverse-on-surface": "#313030",
+                      "outline": "#8e9192",
+                      "on-primary": "#2f3131",
+                      "on-tertiary-fixed-variant": "#474646",
+                      "primary": "#ffffff",
+                      "surface-tint": "#c6c6c7",
+                      "error": "#ffb4ab",
+                      "on-tertiary-fixed": "#1c1b1b",
+                      "surface-dim": "#131313",
+                      "surface-variant": "#353535",
+                      "on-tertiary": "#313030",
+                      "background": "#131313",
+                      "primary-fixed": "#e2e2e2",
+                      "error-container": "#93000a",
+                      "inverse-primary": "#5d5f5f",
+                      "surface-container-low": "#1c1b1b",
+                      "outline-variant": "#444748",
+                      "surface-container-lowest": "#0e0e0e",
+                      "surface": "#131313",
+                      "on-secondary-container": "#002661",
+                      "on-primary-fixed-variant": "#454747",
+                      "on-error-container": "#ffdad6",
+                      "on-secondary": "#002d6f",
+                      "secondary-fixed": "#d9e2ff",
+                      "secondary": "#b0c6ff",
+                      "surface-container-high": "#2a2a2a",
+                      "on-secondary-fixed": "#001945",
+                      "surface-container": "#20201f",
+                      "on-surface": "#e5e2e1",
+                      "inverse-surface": "#e5e2e1",
+                      "secondary-container": "#568dff",
+                      "on-error": "#690005",
+                      "secondary-fixed-dim": "#b0c6ff",
+                      "on-primary-container": "#636565",
+                      "tertiary-fixed": "#e5e2e1",
+                      "primary-container": "#e2e2e2",
+                      "surface-bright": "#393939",
+                      "on-secondary-fixed-variant": "#00429c",
+                      "tertiary-fixed-dim": "#c9c6c5",
+                      "surface-container-highest": "#353535",
+                      "on-tertiary-container": "#656464",
+                      "on-primary-fixed": "#1a1c1c",
+                      "on-background": "#e5e2e1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "max-width": "1440px",
+                      "margin-mobile": "20px",
+                      "margin-desktop": "64px",
+                      "grid-unit": "8px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "body-base": [
+                              "Hanken Grotesk"
+                      ],
+                      "display-lg-mobile": [
+                              "Hanken Grotesk"
+                      ],
+                      "technical-sm": [
+                              "Space Mono"
+                      ],
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "display-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "label-caps": [
+                              "Space Mono"
+                      ]
+              },
+              "fontSize": {
+                      "body-base": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "40px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "technical-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "72px",
+                              {
+                                      "lineHeight": "80px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-caps": [
+                              "10px",
+                              {
+                                      "lineHeight": "12px",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        /* Blueprint Grid Pattern */
+        .blueprint-bg {
+            background-color: #131313;
+            background-image: 
+                linear-gradient(rgba(0, 112, 255, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 112, 255, 0.15) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid transparent;
+            border-image: linear-gradient(to bottom right, rgba(255,255,255,0.2), rgba(0,112,255,0.2)) 1;
+        }
+
+        /* Hover Glow Effect */
+        .glow-hover:hover {
+            box-shadow: 0 0 20px rgba(0, 112, 255, 0.4);
+            border-color: rgba(0, 112, 255, 0.8);
+            border-image: none;
+            transition: all 0.3s ease;
+        }
+
+        /* Dimension Line Utility */
+        .dimension-line {
+            position: relative;
+            height: 1px;
+            background-color: rgba(0, 112, 255, 0.4);
+            width: 100%;
+        }
+        .dimension-line::before, .dimension-line::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            width: 1px;
+            height: 9px;
+            background-color: rgba(0, 112, 255, 0.4);
+            transform: rotate(45deg);
+        }
+        .dimension-line::before { left: 0; }
+        .dimension-line::after { right: 0; }
+    </style>
+</head>
+<body class="blueprint-bg min-h-screen text-on-surface font-body-base antialiased flex flex-col">
+<!-- Top Navigation Bar (Generated from JSON Anchor) -->
+<header class="bg-surface/80 backdrop-blur-xl text-primary font-label-caps text-label-caps fixed top-0 w-full z-50 border-b border-secondary/20 shadow-[0_0_20px_rgba(86,141,255,0.15)] transition-all duration-300 ease-out">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop h-20 max-w-max-width mx-auto">
+<!-- Brand Logo -->
+<div class="font-display-lg md:text-display-lg text-display-lg-mobile tracking-tighter text-primary">
+                ARCHITEX.v1
+            </div>
+<!-- Navigation Links (Web) -->
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:bg-primary/5 hover:shadow-[0_0_15px_rgba(86,141,255,0.3)] px-3 py-2" href="#">Home</a>
+<a class="text-primary border-b border-primary pb-1 hover:bg-primary/5 hover:shadow-[0_0_15px_rgba(86,141,255,0.3)] px-3 py-2" href="#">Certificates</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:bg-primary/5 hover:shadow-[0_0_15px_rgba(86,141,255,0.3)] px-3 py-2" href="#">Login</a>
+</nav>
+<!-- Trailing Action -->
+<div class="hidden md:block">
+<button class="bg-[#0070FF] text-white px-6 py-2 rounded-none hover:shadow-[0_0_20px_rgba(0,112,255,0.6)] transition-shadow duration-300">
+                    Contact
+                </button>
+</div>
+<!-- Mobile Menu Icon (Placeholder for functionality) -->
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">menu</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-32 pb-24 px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto w-full">
+<!-- Page Header -->
+<div class="mb-16">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 glass-panel flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">workspace_premium</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary">CERTIFICATION REPOSITORY</h1>
+<div class="dimension-line mt-2 mb-2 w-64"></div>
+<p class="font-technical-sm text-technical-sm text-on-surface-variant uppercase tracking-widest">Index: 004 // Verified Credentials</p>
+</div>
+</div>
+<p class="font-body-base text-body-base text-on-surface-variant max-w-2xl mt-6">
+                A curated archive of professional certifications and technical qualifications, validating structural design competencies and specialized engineering proficiencies.
+            </p>
+</div>
+<!-- Bento Grid Gallery -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Certificate Card 1 -->
+<article class="glass-panel glow-hover p-6 flex flex-col group cursor-pointer h-full">
+<div class="mb-6 relative w-full pt-[75%] bg-surface-container overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500 grayscale group-hover:grayscale-0" data-alt="A macro shot of a sleek, modern architectural degree certificate printed on heavy, matte dark grey paper. The text is embossed in a highly reflective, metallic electric blue foil. The lighting is dramatic, casting sharp shadows that emphasize the texture of the paper and the precision of the embossing. The overall aesthetic is structural, high-tech, and speculative engineering style, with a dark background context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRRTNycvSII4lm5sQ1rfnGfejw8nNH2-DIi-O93J2Fuxu9RWcv1gFMSUnJA58ttuRhYbEhSCUsiVCQQtjLRj0Swm-ltMR31XQeURJuyKudy45ak97z0-VlYMBC_qleEH9CXAXpjR9dfM6uMPxq6JSLCoPi_jFCM1D4OWnPHGLt0IYf4Z5ZUZr4uJq7CoHMl2PosKYvFu2pJNvQQI-b9BskQBEW-w2cZcQO6l2ZxfyFhNVrmwpnaxM"/>
+<div class="absolute inset-0 border border-secondary/20 m-2"></div>
+</div>
+<div class="flex-grow flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-headline-md text-headline-md text-primary" style="font-size: 24px; line-height: 32px;">Advanced Structural Analysis</h2>
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+</div>
+<p class="font-technical-sm text-technical-sm text-secondary-container mb-4">ISSUED BY: Institute of Civil Engineering</p>
+<p class="font-body-base text-body-base text-on-surface-variant text-sm mb-4">Comprehensive certification covering non-linear structural dynamics, finite element analysis, and seismic design principles.</p>
+</div>
+<div class="mt-auto">
+<div class="dimension-line mb-3"></div>
+<div class="flex justify-between font-technical-sm text-technical-sm text-outline">
+<span>DATE: 2023.11</span>
+<span>ID: ASA-99201</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Certificate Card 2 -->
+<article class="glass-panel glow-hover p-6 flex flex-col group cursor-pointer h-full">
+<div class="mb-6 relative w-full pt-[75%] bg-surface-container overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500 grayscale group-hover:grayscale-0" data-alt="A highly detailed, technical blueprint-style digital rendering of a certification badge or seal. The seal features complex geometric intersecting lines, similar to an architectural CAD drawing, rendered in bright electric blue against a deep, almost black graph paper background. The lighting suggests a glowing screen in a dark engineering lab. The mood is precise, analytical, and professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCd_ykEXEnQK7FqP0F2fM3D9Imh0lGNxlL1bOsuK5mmPPLSwyG_ss4VqvjbhvbZJ-Dbiw2h0C059uD0Btw71DEMImOTGegJKOMPNkqKmkIbW0KKfTH4RGP2e4bWOBtmjxEl3pH_IN2A_W-Ql4V36qZkUWCKUyeCl-xeTMc-h8PTcMO4sXbF-iffpZnNELpR7tg9Z5PR-4gLdckmdDO4OV2lK0dEz93sBoeCGQgHcJwuDQ24YntwKx4"/>
+<div class="absolute inset-0 border border-secondary/20 m-2"></div>
+</div>
+<div class="flex-grow flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-headline-md text-headline-md text-primary" style="font-size: 24px; line-height: 32px;">Sustainable Urban Planning</h2>
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+</div>
+<p class="font-technical-sm text-technical-sm text-secondary-container mb-4">ISSUED BY: Global Green Build Council</p>
+<p class="font-body-base text-body-base text-on-surface-variant text-sm mb-4">Accreditation in designing resilient urban infrastructure with a focus on zero-carbon emissions and closed-loop material cycles.</p>
+</div>
+<div class="mt-auto">
+<div class="dimension-line mb-3"></div>
+<div class="flex justify-between font-technical-sm text-technical-sm text-outline">
+<span>DATE: 2022.05</span>
+<span>ID: SUP-4418X</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Certificate Card 3 -->
+<article class="glass-panel glow-hover p-6 flex flex-col group cursor-pointer h-full">
+<div class="mb-6 relative w-full pt-[75%] bg-surface-container overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500 grayscale group-hover:grayscale-0" data-alt="A close-up photograph of a sleek, minimalist framed certificate leaning against a concrete wall. The frame is brushed aluminum. The certificate itself is a dark, matte surface with stark white typography and subtle electric blue architectural schematics watermarked in the background. The lighting is cool, studio lighting creating soft shadows, emphasizing a modern, speculative engineering design aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNmWby_5kc3h60sR8DQ7F2OW3ddec_TGLERG66NGArquIVf7MH7e1WMP3_P65aF5gFTluUsdOqsH1nctoxUB5BCQp07sWoJ6EkTpDEVcP9lXCFSHe7uyS2_acf8Kn-axjU5hsiHNdwm5nt5ffGdUPjjLO0hzEFuVM45--d5o71u6x8uEqFQ40cqm443fnyUT6Ymns3cbPfyrU93FXOIcF3ZZCBS4REZogl0NY11rIq-eYlTmWQ76s"/>
+<div class="absolute inset-0 border border-secondary/20 m-2"></div>
+</div>
+<div class="flex-grow flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-headline-md text-headline-md text-primary" style="font-size: 24px; line-height: 32px;">Parametric Modeling Mastery</h2>
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+</div>
+<p class="font-technical-sm text-technical-sm text-secondary-container mb-4">ISSUED BY: Design Computation Academy</p>
+<p class="font-body-base text-body-base text-on-surface-variant text-sm mb-4">Advanced proficiency in algorithmic design tools, generative geometry creation, and automated architectural detailing processes.</p>
+</div>
+<div class="mt-auto">
+<div class="dimension-line mb-3"></div>
+<div class="flex justify-between font-technical-sm text-technical-sm text-outline">
+<span>DATE: 2024.01</span>
+<span>ID: PMM-7002B</span>
+</div>
+</div>
+</div>
+</article>
+</div>
+<!-- Technical Callout Section -->
+<div class="mt-24 glass-panel p-8 md:p-12 border-t border-b border-[#0070FF]/30">
+<div class="flex flex-col md:flex-row gap-8 items-center justify-between">
+<div class="flex-1">
+<h3 class="font-headline-md text-headline-md text-primary mb-4">VERIFICATION PROTOCOL</h3>
+<p class="font-body-base text-body-base text-on-surface-variant">All credentials listed within this repository are cryptographically secured and verifiable through the central architectural registry. For detailed syllabi or validation hashes, please initiate a request.</p>
+</div>
+<div>
+<button class="border border-[#0070FF]/50 text-[#0070FF] font-technical-sm text-technical-sm px-8 py-4 hover:bg-[#0070FF]/10 hover:shadow-[0_0_20px_rgba(0,112,255,0.4)] transition-all duration-300 flex items-center gap-2">
+<span class="material-symbols-outlined">qr_code_scanner</span>
+                        REQUEST VALIDATION HASH
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Generated from JSON Anchor) -->
+<footer class="bg-background text-on-surface-variant font-technical-sm text-technical-sm w-full py-8 border-t border-outline-variant/30 flat opacity-80 hover:opacity-100 transition-opacity flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop gap-4">
+<div class="font-label-caps text-label-caps text-primary">
+            © 2024 SYSTEM_REDACTED. ARCHITECTURAL SPECIFICATION V.04
+        </div>
+<nav class="flex gap-6">
+<a class="text-on-surface-variant hover:text-secondary" href="#">Documentation</a>
+<a class="text-on-surface-variant hover:text-secondary" href="#">Source</a>
+<a class="text-on-surface-variant hover:text-secondary" href="#">Privacy</a>
+</nav>
+</footer>
+</body></html>
