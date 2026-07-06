@@ -7,7 +7,7 @@ import GlobalLoader from "./GlobalLoader";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ARCHITEX.v1 - Speculative Engineering Portfolio",
+  title: "GRD-Port v1.6",
   description: "Crafting digital structures with mathematical precision and ethereal depth. A portfolio of high-fidelity prototypes, systems architectures, and interactive schematics.",
 };
 
