@@ -176,5 +176,6 @@ export default async function Home() {
         <ProjectGrid />
       </section>
     </div>
+    </div>
   );
 }
