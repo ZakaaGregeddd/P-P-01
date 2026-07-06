@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { playNavClickSound } from '@/lib/sfx';
 
 export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [isExtended, setIsExtended] = useState(true);
@@ -62,6 +63,7 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
           <nav className="hidden md:flex gap-8">
             <Link
               href="/"
+              onClick={() => playNavClickSound()}
               className={`font-label-caps text-label-caps tracking-[0.15em] cursor-pointer hover:text-secondary transition-all duration-300 px-3 py-1.5 ${
                 pathname === '/'
                   ? 'text-primary border-b border-secondary shadow-[0_4px_12px_-2px_rgba(86,141,255,0.5)]'
@@ -72,6 +74,7 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
             </Link>
             <Link
               href="/certificates"
+              onClick={() => playNavClickSound()}
               className={`font-label-caps text-label-caps tracking-[0.15em] cursor-pointer hover:text-secondary transition-all duration-300 px-3 py-1.5 ${
                 pathname === '/certificates'
                   ? 'text-primary border-b border-secondary shadow-[0_4px_12px_-2px_rgba(86,141,255,0.5)]'
@@ -82,6 +85,7 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
             </Link>
             <Link
               href={isLoggedIn ? '/admin' : '/login'}
+              onClick={() => playNavClickSound()}
               className={`font-label-caps text-label-caps tracking-[0.15em] cursor-pointer hover:text-secondary transition-all duration-300 px-3 py-1.5 ${
                 pathname === '/login' || pathname === '/admin'
                   ? 'text-primary border-b border-secondary shadow-[0_4px_12px_-2px_rgba(86,141,255,0.5)]'
@@ -99,6 +103,7 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
           </span>
           <a
             href="mailto:admin@architex.v1"
+            onClick={() => playNavClickSound()}
             className="bg-secondary text-primary font-label-caps text-label-caps px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm hover:shadow-[0_0_20px_rgba(0,112,255,0.6)] transition-all duration-300"
           >
             Contact
@@ -136,7 +141,10 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
         <nav className="flex flex-col py-2">
           <Link
             href="/"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => {
+              playNavClickSound();
+              setIsMobileMenuOpen(false);
+            }}
             className={`font-label-caps text-label-caps tracking-[0.15em] py-3.5 px-margin-mobile border-b border-white/5 transition-colors ${
               pathname === '/' ? 'text-secondary bg-white/5' : 'text-on-surface-variant hover:text-secondary'
             }`}
@@ -145,7 +153,10 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
           </Link>
           <Link
             href="/certificates"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => {
+              playNavClickSound();
+              setIsMobileMenuOpen(false);
+            }}
             className={`font-label-caps text-label-caps tracking-[0.15em] py-3.5 px-margin-mobile border-b border-white/5 transition-colors ${
               pathname === '/certificates' ? 'text-secondary bg-white/5' : 'text-on-surface-variant hover:text-secondary'
             }`}
@@ -154,7 +165,10 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
           </Link>
           <Link
             href={isLoggedIn ? '/admin' : '/login'}
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => {
+              playNavClickSound();
+              setIsMobileMenuOpen(false);
+            }}
             className={`font-label-caps text-label-caps tracking-[0.15em] py-3.5 px-margin-mobile transition-colors ${
               pathname === '/login' || pathname === '/admin' ? 'text-secondary bg-white/5' : 'text-on-surface-variant hover:text-secondary'
             }`}
@@ -172,7 +186,10 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
       >
         <div className="flex items-center gap-3 pr-4 border-r border-white/10">
           <button
-            onClick={() => router.push('/')}
+            onClick={() => {
+              playNavClickSound();
+              router.push('/');
+            }}
             className={`material-symbols-outlined text-[20px] transition-colors hover:text-secondary border-none outline-none focus:outline-none bg-transparent cursor-pointer ${
               pathname === '/' ? 'text-secondary drop-shadow-[0_0_5px_rgba(176,198,255,0.8)]' : 'text-on-surface-variant'
             }`}
@@ -181,7 +198,10 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
             architecture
           </button>
           <button
-            onClick={() => router.push('/certificates')}
+            onClick={() => {
+              playNavClickSound();
+              router.push('/certificates');
+            }}
             className={`material-symbols-outlined text-[20px] transition-colors hover:text-secondary border-none outline-none focus:outline-none bg-transparent cursor-pointer ${
               pathname === '/certificates' ? 'text-secondary drop-shadow-[0_0_5px_rgba(176,198,255,0.8)]' : 'text-on-surface-variant'
             }`}
@@ -190,7 +210,10 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
             verified
           </button>
           <button
-            onClick={() => router.push(isLoggedIn ? '/admin' : '/login')}
+            onClick={() => {
+              playNavClickSound();
+              router.push(isLoggedIn ? '/admin' : '/login');
+            }}
             className={`material-symbols-outlined text-[20px] transition-colors hover:text-secondary border-none outline-none focus:outline-none bg-transparent cursor-pointer ${
               pathname === '/login' || pathname === '/admin' ? 'text-secondary drop-shadow-[0_0_5px_rgba(176,198,255,0.8)]' : 'text-on-surface-variant'
             }`}
@@ -199,7 +222,13 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
             login
           </button>
         </div>
-        <button className="flex items-center gap-2 group cursor-pointer border-none outline-none focus:outline-none focus:ring-0 bg-transparent p-0" onClick={toggleNav}>
+        <button 
+          className="flex items-center gap-2 group cursor-pointer border-none outline-none focus:outline-none focus:ring-0 bg-transparent p-0" 
+          onClick={() => {
+            playNavClickSound();
+            toggleNav();
+          }}
+        >
           <span className="font-technical-sm text-technical-sm text-primary group-hover:text-secondary transition-colors">
             NAV.TRIGGER
           </span>

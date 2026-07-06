@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import AdaptiveNavbar from "./AdaptiveNavbar";
 import LavaBackground from "./LavaBackground";
+import GlobalLoader from "./GlobalLoader";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -29,6 +30,9 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
       <body className="bg-background text-on-background font-body-base min-h-screen blueprint-grid relative flex flex-col justify-between selection:bg-secondary/30 selection:text-primary">
+        {/* Global Loading Screen Overlay */}
+        <GlobalLoader />
+
         {/* Global Lava Lamp Background Animation */}
         <LavaBackground />
 

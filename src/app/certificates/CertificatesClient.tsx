@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Certificate } from '@/lib/db';
+import { playElectricSparkSound } from '@/lib/sfx';
 
 interface CertificatesClientProps {
   initialCerts: Certificate[];
@@ -100,6 +101,7 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
               <article 
                 key={`feat-${cert._id}`} 
                 onClick={() => cert.fileUrl && window.open(cert.fileUrl, '_blank')}
+                onMouseEnter={() => playElectricSparkSound()}
                 className="glass-panel glow-hover p-5 flex flex-col group cursor-pointer h-full border-t-2 border-t-secondary/40 hover:scale-[1.02] transition-all duration-300 relative"
               >
                 <div className="mb-4 relative w-full pt-[45%] bg-surface-container overflow-hidden">
@@ -218,6 +220,7 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
               <div 
                 key={`arch-${cert._id}`} 
                 className="glass-panel p-4 group hover:bg-white/5 hover:scale-[1.02] transition-all duration-300 cursor-pointer border-l-2 border-l-secondary/20 flex flex-col justify-between relative"
+                onMouseEnter={() => playElectricSparkSound()}
                 onClick={() => {
                   if (cert.fileUrl) {
                     window.open(cert.fileUrl, '_blank');

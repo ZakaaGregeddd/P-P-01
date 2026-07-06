@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { playElectricSparkSound } from '../lib/sfx';
 
 export default function ProjectGrid() {
   const [visibleItems, setVisibleItems] = useState<{ [key: string]: boolean }>({});
@@ -35,6 +36,7 @@ export default function ProjectGrid() {
       {/* Bento Item 1 - Large */}
       <div
         data-id="proj-1"
+        onMouseEnter={() => playElectricSparkSound()}
         className={`md:col-span-8 glass-panel p-6 glow-hover group flex flex-col justify-between min-h-[400px] transition-all duration-[800ms] ease-out transform relative ${
           visibleItems['proj-1']
             ? 'opacity-100 translate-x-0 translate-y-0'
@@ -70,6 +72,7 @@ export default function ProjectGrid() {
       {/* Bento Item 2 - Small */}
       <div
         data-id="proj-2"
+        onMouseEnter={() => playElectricSparkSound()}
         className={`md:col-span-4 glass-panel p-6 glow-hover group flex flex-col justify-between min-h-[400px] transition-all duration-[800ms] ease-out delay-[200ms] transform relative ${
           visibleItems['proj-2']
             ? 'opacity-100 translate-x-0 translate-y-0'

@@ -70,7 +70,7 @@ export default async function Home() {
           </div>
 
           {/* Personnel Profile // Bio-Data (Bottom part) */}
-          <InteractiveCard className="glass-panel p-5 relative overflow-hidden group hover:border-secondary/40 transition-all duration-300">
+          <div className="glass-panel p-5 relative overflow-hidden group hover:border-secondary/40 transition-all duration-300">
             {/* Section Header */}
             <div className="flex justify-between items-end border-b border-outline-variant/30 pb-2 mb-4">
               <h2 className="font-headline-md text-xs text-primary tracking-tight uppercase">
@@ -132,12 +132,12 @@ export default async function Home() {
 
             {/* Decorative Blueprint Grid Overlay */}
             <div className="absolute inset-0 blueprint-grid-fine opacity-[0.05] pointer-events-none"></div>
-          </InteractiveCard>
+          </div>
         </div>
 
         {/* Right Side: Profile Photo Glass Card */}
         <div className="md:col-span-5 lg:col-span-4 relative mt-12 md:mt-0 flex flex-col justify-center">
-          <InteractiveCard className="glass-panel p-5 relative group glow-hover hover:border-secondary/40 transition-all duration-500 w-full">
+          <div className="glass-panel p-5 relative group glow-hover hover:border-secondary/40 transition-all duration-500 w-full">
             {/* Corner brackets */}
             <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-primary/50"></div>
             <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-primary/50"></div>
@@ -162,7 +162,7 @@ export default async function Home() {
                 SYS.VER: {sysVer}<br />STATUS: {status}
               </div>
             </div>
-          </InteractiveCard>
+          </div>
         </div>
       </section>
 
