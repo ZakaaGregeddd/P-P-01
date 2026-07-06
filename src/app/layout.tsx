@@ -63,7 +63,7 @@ export default async function RootLayout({
         {/* Footer */}
         <footer className="w-full py-4 bg-background border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop gap-2 z-10 relative">
           <div className="font-label-caps text-[9px] text-primary opacity-60 tracking-wider">
-            © 2024 SYSTEM_REDACTED. ARCHITECTURAL SPECIFICATION V.04
+            © 2026 SYSTEM_REDACTED. GRD-PORT SPECIFICATION V1.6
           </div>
           <div className="flex gap-4 font-technical-sm text-[10px] text-on-surface-variant">
             <Link href="#" className="hover:text-secondary opacity-75 hover:opacity-100 transition-opacity">Documentation</Link>

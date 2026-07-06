@@ -46,11 +46,8 @@ if (typeof window !== 'undefined') {
  */
 export function playHoverSound() {
   const ctx = getAudioContext();
-  if (!ctx) return;
-
-  if (ctx.state === 'suspended') {
-    ctx.resume().catch(() => {});
-  }
+  // Only play if the audio context has been actively unlocked/resumed
+  if (!ctx || ctx.state !== 'running') return;
 
   try {
     const osc = ctx.createOscillator();
@@ -79,11 +76,8 @@ export function playHoverSound() {
  */
 export function playElectricSparkSound() {
   const ctx = getAudioContext();
-  if (!ctx) return;
-
-  if (ctx.state === 'suspended') {
-    ctx.resume().catch(() => {});
-  }
+  // Only play if the audio context has been actively unlocked/resumed
+  if (!ctx || ctx.state !== 'running') return;
 
   try {
     const now = ctx.currentTime;
@@ -127,6 +121,7 @@ export function playNavClickSound() {
   const ctx = getAudioContext();
   if (!ctx) return;
 
+  // Nav click is triggered by a direct user gesture (click), so we force resume it
   if (ctx.state === 'suspended') {
     ctx.resume().catch(() => {});
   }

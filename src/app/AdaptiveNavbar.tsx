@@ -102,7 +102,9 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
             SYS.STATUS // ACTIVE
           </span>
           <a
-            href="mailto:admin@architex.v1"
+            href="https://wa.me/6282289664966"
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={() => playNavClickSound()}
             className="bg-secondary text-primary font-label-caps text-label-caps px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm hover:shadow-[0_0_20px_rgba(0,112,255,0.6)] transition-all duration-300"
           >
