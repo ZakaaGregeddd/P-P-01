@@ -1,8 +1,33 @@
 import Link from "next/link";
 import ProjectGrid from "./ProjectGrid";
 import WelcomeLava from "./WelcomeLava";
+import { getCollection } from "@/lib/db";
+import InteractiveCard from "./InteractiveCard";
 
-export default function Home() {
+export default async function Home() {
+  let bio: any = null;
+  try {
+    const collection = await getCollection('biodata');
+    bio = await collection.findOne({ key: 'admin_biodata' });
+  } catch (err) {
+    console.error('Failed to load biodata on home page:', err);
+  }
+
+  // Pre-configured fallbacks
+  const name = bio?.name || "J. DOE";
+  const designation = bio?.designation || "Lead Architect // Systems Designer";
+  const specialization = bio?.specialization || "Computational Geometry & Structural Logic";
+  const statement = bio?.statement || "Bridging the gap between speculative engineering and functional architecture through high-fidelity digital prototyping and mathematical precision.";
+  const sysVer = bio?.sysVer || "4.2.0";
+  const status = bio?.status || "ONLINE";
+  const photoUrl = bio?.photoUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuBvgbA9HjgJL9iojhLKW5pRErIqn0pxb1IR0mWXv3fAIBEGuBHvgPYeqq4mNoC_Uu97GyrwDhUThRS_CN-skLS9scv3DcviaeJKSvJM9d52gtn_qWyVYOD77YFd-rciIEWMUif30ROOovXKBmUE6EzNvE7vG7mJjJlL6H2a-nn9lFB7Sfk_6KxPd-IpKuqLLXGgaEh7mlp4rHQHjidws1W_sG4D7Iwl4j6WWeC4GdfwLV2vU40yrPo";
+  
+  const competencies = bio?.competencies || [
+    { name: "Systems Architecture", value: 94 },
+    { name: "Generative Design", value: 88 },
+    { name: "Structural Analysis", value: 91 }
+  ];
+
   return (
     <div className="relative w-full overflow-hidden">
       <WelcomeLava />
@@ -45,7 +70,7 @@ export default function Home() {
           </div>
 
           {/* Personnel Profile // Bio-Data (Bottom part) */}
-          <div className="glass-panel p-5 relative overflow-hidden">
+          <InteractiveCard className="glass-panel p-5 relative overflow-hidden group hover:border-secondary/40 transition-all duration-300">
             {/* Section Header */}
             <div className="flex justify-between items-end border-b border-outline-variant/30 pb-2 mb-4">
               <h2 className="font-headline-md text-xs text-primary tracking-tight uppercase">
@@ -62,15 +87,15 @@ export default function Home() {
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between border-b border-outline-variant/10 pb-0.5">
                     <span className="font-technical-sm text-[10px] text-on-surface-variant">NAME:</span>
-                    <span className="font-technical-sm text-[10px] text-primary">J. DOE</span>
+                    <span className="font-technical-sm text-[10px] text-primary">{name}</span>
                   </div>
                   <div className="flex justify-between border-b border-outline-variant/10 pb-0.5">
                     <span className="font-technical-sm text-[10px] text-on-surface-variant">DESIGNATION:</span>
-                    <span className="font-technical-sm text-[10px] text-primary">Lead Architect // Systems Designer</span>
+                    <span className="font-technical-sm text-[10px] text-primary">{designation}</span>
                   </div>
                   <div className="flex justify-between border-b border-outline-variant/10 pb-0.5">
                     <span className="font-technical-sm text-[10px] text-on-surface-variant">SPECIALIZATION:</span>
-                    <span className="font-technical-sm text-[10px] text-primary">Computational Geometry &amp; Structural Logic</span>
+                    <span className="font-technical-sm text-[10px] text-primary">{specialization}</span>
                   </div>
                 </div>
 
@@ -79,7 +104,7 @@ export default function Home() {
                     [ STATEMENT ]
                   </div>
                   <p className="font-body-base text-[11px] text-on-surface-variant italic leading-relaxed">
-                    &quot;Bridging the gap between speculative engineering and functional architecture through high-fidelity digital prototyping and mathematical precision.&quot;
+                    &quot;{statement}&quot;
                   </p>
                 </div>
               </div>
@@ -90,47 +115,29 @@ export default function Home() {
                   [ CORE COMPETENCIES ]
                 </div>
                 <div className="flex flex-col gap-2.5">
-                  <div className="flex flex-col gap-0.5">
-                    <div className="flex justify-between font-technical-sm text-[9px] text-on-surface-variant uppercase">
-                      <span>Systems Architecture</span>
-                      <span>94%</span>
+                  {competencies.map((comp: any, idx: number) => (
+                    <div key={idx} className="flex flex-col gap-0.5">
+                      <div className="flex justify-between font-technical-sm text-[9px] text-on-surface-variant uppercase">
+                        <span>{comp.name}</span>
+                        <span>{comp.value}%</span>
+                      </div>
+                      <div className="h-1 w-full bg-surface-container-highest">
+                        <div className="h-full bg-secondary" style={{ width: `${comp.value}%` }}></div>
+                      </div>
                     </div>
-                    <div className="h-1 w-full bg-surface-container-highest">
-                      <div className="h-full bg-secondary" style={{ width: '94%' }}></div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col gap-0.5">
-                    <div className="flex justify-between font-technical-sm text-[9px] text-on-surface-variant uppercase">
-                      <span>Generative Design</span>
-                      <span>88%</span>
-                    </div>
-                    <div className="h-1 w-full bg-surface-container-highest">
-                      <div className="h-full bg-secondary" style={{ width: '88%' }}></div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-0.5">
-                    <div className="flex justify-between font-technical-sm text-[9px] text-on-surface-variant uppercase">
-                      <span>Structural Analysis</span>
-                      <span>91%</span>
-                    </div>
-                    <div className="h-1 w-full bg-surface-container-highest">
-                      <div className="h-full bg-secondary" style={{ width: '91%' }}></div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
 
             {/* Decorative Blueprint Grid Overlay */}
             <div className="absolute inset-0 blueprint-grid-fine opacity-[0.05] pointer-events-none"></div>
-          </div>
+          </InteractiveCard>
         </div>
 
         {/* Right Side: Profile Photo Glass Card */}
         <div className="md:col-span-5 lg:col-span-4 relative mt-12 md:mt-0 flex flex-col justify-center">
-          <div className="glass-panel p-5 relative group glow-hover transition-all duration-500 w-full">
+          <InteractiveCard className="glass-panel p-5 relative group glow-hover hover:border-secondary/40 transition-all duration-500 w-full">
             {/* Corner brackets */}
             <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-primary/50"></div>
             <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-primary/50"></div>
@@ -140,22 +147,22 @@ export default function Home() {
             <div className="aspect-[1/0.92] bg-surface-container-lowest relative overflow-hidden mb-4">
               <img 
                 className="w-full h-full object-cover opacity-80 mix-blend-luminosity hover:mix-blend-normal transition-all duration-700" 
-                alt="A striking portrait of a digital architect in a dark, neon-lit server room. High-contrast lighting with vivid electric blue highlights defining structural facial features." 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvgbA9HjgJL9iojhLKW5pRErIqn0pxb1IR0mWXv3fAIBEGuBHvgPYeqq4mNoC_Uu97GyrwDhUThRS_CN-skLS9scv3DcviaeJKSvJM9d52gtn_qWyVYOD77YFd-rciIEWMUif30ROOovXKBmUE6EzNvE7vG7mJjJlL6H2a-nn9lFB7Sfk_6KxPd-IpKuqLLXGgaEh7mlp4rHQHjidws1W_sG4D7Iwl4j6WWeC4GdfwLV2vU40yrPo"
+                alt="A striking portrait of a digital architect in a dark, neon-lit server room." 
+                src={photoUrl}
               />
               <div className="absolute inset-0 blueprint-grid-fine opacity-20 pointer-events-none"></div>
             </div>
             
             <div className="flex justify-between items-end border-t border-outline-variant/30 pt-4">
               <div>
-                <div className="font-label-caps text-label-caps text-secondary mb-1">LEAD ARCHITECT</div>
-                <div className="font-headline-md text-headline-md text-primary">J. DOE</div>
+                <div className="font-label-caps text-label-caps text-secondary mb-1">{designation.split('//')[0] || 'ARCHITECT'}</div>
+                <div className="font-headline-md text-headline-md text-primary">{name}</div>
               </div>
               <div className="font-technical-sm text-technical-sm text-on-surface-variant text-right">
-                SYS.VER: 4.2.0<br />STATUS: ONLINE
+                SYS.VER: {sysVer}<br />STATUS: {status}
               </div>
             </div>
-          </div>
+          </InteractiveCard>
         </div>
       </section>
 
@@ -168,7 +175,6 @@ export default function Home() {
         
         <ProjectGrid />
       </section>
-    </div>
     </div>
   );
 }

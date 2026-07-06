@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { addCertificate, deleteCertificate, logout } from '../actions';
+import { addCertificate, deleteCertificate, logout, updateBiodata } from '../actions';
 
 interface AdminCert {
   _id: string;
@@ -15,7 +15,24 @@ interface AdminCert {
   fileSize?: number;
 }
 
-export default function AdminDashboard({ initialCerts }: { initialCerts: AdminCert[] }) {
+interface AdminBiodata {
+  name: string;
+  designation: string;
+  specialization: string;
+  statement: string;
+  sysVer: string;
+  status: string;
+  photoUrl: string;
+  competencies?: Array<{ name: string; value: number }>;
+}
+
+export default function AdminDashboard({ 
+  initialCerts,
+  initialBiodata
+}: { 
+  initialCerts: AdminCert[];
+  initialBiodata: AdminBiodata | null;
+}) {
   const router = useRouter();
   const [name, setName] = useState('');
   const [issuer, setIssuer] = useState('');
@@ -27,6 +44,28 @@ export default function AdminDashboard({ initialCerts }: { initialCerts: AdminCe
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Biodata state
+  const [bioName, setBioName] = useState(initialBiodata?.name || 'J. DOE');
+  const [bioDesignation, setBioDesignation] = useState(initialBiodata?.designation || 'Lead Architect // Systems Designer');
+  const [bioSpecialization, setBioSpecialization] = useState(initialBiodata?.specialization || 'Computational Geometry & Structural Logic');
+  const [bioStatement, setBioStatement] = useState(initialBiodata?.statement || 'Bridging the gap between speculative engineering and functional architecture through high-fidelity digital prototyping and mathematical precision.');
+  const [bioSysVer, setBioSysVer] = useState(initialBiodata?.sysVer || '4.2.0');
+  const [bioStatus, setBioStatus] = useState(initialBiodata?.status || 'ONLINE');
+  const [bioPhotoUrl, setBioPhotoUrl] = useState(initialBiodata?.photoUrl || '');
+  const [bioPhotoFile, setBioPhotoFile] = useState<File | null>(null);
+
+  // Competencies state
+  const [comp1Name, setComp1Name] = useState(initialBiodata?.competencies?.[0]?.name || 'Systems Architecture');
+  const [comp1Value, setComp1Value] = useState(initialBiodata?.competencies?.[0]?.value || 94);
+  const [comp2Name, setComp2Name] = useState(initialBiodata?.competencies?.[1]?.name || 'Generative Design');
+  const [comp2Value, setComp2Value] = useState(initialBiodata?.competencies?.[1]?.value || 88);
+  const [comp3Name, setComp3Name] = useState(initialBiodata?.competencies?.[2]?.name || 'Structural Logic');
+  const [comp3Value, setComp3Value] = useState(initialBiodata?.competencies?.[2]?.value || 91);
+
+  const [bioLoading, setBioLoading] = useState(false);
+  const [bioError, setBioError] = useState('');
+  const [bioSuccess, setBioSuccess] = useState('');
 
   const handleLogout = async () => {
     await logout();
@@ -101,6 +140,46 @@ export default function AdminDashboard({ initialCerts }: { initialCerts: AdminCe
     }
   };
 
+  const handleBioSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBioError('');
+    setBioSuccess('');
+    setBioLoading(true);
+
+    const formData = new FormData();
+    formData.append('name', bioName);
+    formData.append('designation', bioDesignation);
+    formData.append('specialization', bioSpecialization);
+    formData.append('statement', bioStatement);
+    formData.append('sysVer', bioSysVer);
+    formData.append('status', bioStatus);
+    formData.append('photoUrl', bioPhotoUrl);
+    if (bioPhotoFile) {
+      formData.append('photoFile', bioPhotoFile);
+    }
+    formData.append('comp1Name', comp1Name);
+    formData.append('comp1Value', String(comp1Value));
+    formData.append('comp2Name', comp2Name);
+    formData.append('comp2Value', String(comp2Value));
+    formData.append('comp3Name', comp3Name);
+    formData.append('comp3Value', String(comp3Value));
+
+    try {
+      const res = await updateBiodata(formData);
+      if (res.success) {
+        setBioSuccess('Biodata updated successfully.');
+        setBioPhotoFile(null);
+        router.refresh();
+      } else {
+        setBioError(res.error || 'Failed to update biodata.');
+      }
+    } catch (err: any) {
+      setBioError(`Error: ${err.message}`);
+    } finally {
+      setBioLoading(false);
+    }
+  };
+
   return (
     <div className="flex pt-4 min-h-[calc(100vh-160px)] max-w-max-width mx-auto w-full relative z-10">
       {/* Background blueprint guide decoration */}
@@ -112,10 +191,10 @@ export default function AdminDashboard({ initialCerts }: { initialCerts: AdminCe
           <div>
             <div className="absolute -left-4 top-2 bottom-2 w-[1px] bg-secondary/50 hidden md:block"></div>
             <p className="font-technical-sm text-technical-sm text-secondary mb-2 tracking-widest glow-text">
-              SYSTEM.ADMIN // CERT_MGMT_v04
+              SYSTEM.ADMIN // CONTROL_PANEL_v1.6
             </p>
             <h1 className="font-headline-md text-headline-md text-primary tracking-tight">
-              Certificate Management
+              Control Panel &amp; Management
             </h1>
             <div className="dimension-line mt-6 max-w-md hidden md:block"></div>
           </div>
@@ -258,6 +337,207 @@ export default function AdminDashboard({ initialCerts }: { initialCerts: AdminCe
                     className="font-technical-sm text-technical-sm text-surface bg-secondary px-6 py-2 rounded hover:shadow-[0_0_15px_rgba(176,198,255,0.5)] transition-all font-bold cursor-pointer disabled:opacity-50"
                   >
                     {loading ? 'EXECUTING...' : 'EXECUTE_SAVE'}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Biodata Config Form */}
+            <div className="glass-panel rounded-lg p-6 glow-effect transition-all duration-300">
+              <div className="flex items-center justify-between mb-6 border-b border-outline/30 pb-4 relative z-10">
+                <h2 className="font-technical-sm text-technical-sm text-primary tracking-wider">
+                  SYSTEM_CONFIG // BIODATA_EDIT
+                </h2>
+                <span className="material-symbols-outlined text-secondary text-sm">settings</span>
+              </div>
+              
+              <form onSubmit={handleBioSubmit} className="space-y-6 relative z-10">
+                {bioError && (
+                  <div className="border border-error/50 bg-error/10 text-error p-3 rounded text-technical-sm font-technical-sm tracking-wider uppercase text-center">
+                    ERROR: {bioError}
+                  </div>
+                )}
+                {bioSuccess && (
+                  <div className="border border-secondary/50 bg-secondary/10 text-secondary p-3 rounded text-technical-sm font-technical-sm tracking-wider uppercase text-center">
+                    SUCCESS: {bioSuccess}
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                    PERSONNEL_NAME
+                  </label>
+                  <input 
+                    type="text" 
+                    value={bioName}
+                    onChange={(e) => setBioName(e.target.value)}
+                    className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
+                    placeholder="e.g. J. DOE" 
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                    DESIGNATION
+                  </label>
+                  <input 
+                    type="text" 
+                    value={bioDesignation}
+                    onChange={(e) => setBioDesignation(e.target.value)}
+                    className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
+                    placeholder="e.g. Lead Architect // Systems Designer" 
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                    SPECIALIZATION
+                  </label>
+                  <input 
+                    type="text" 
+                    value={bioSpecialization}
+                    onChange={(e) => setBioSpecialization(e.target.value)}
+                    className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
+                    placeholder="e.g. Computational Geometry" 
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                    STATEMENT
+                  </label>
+                  <textarea 
+                    value={bioStatement}
+                    onChange={(e) => setBioStatement(e.target.value)}
+                    rows={3}
+                    className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all resize-none" 
+                    placeholder="Statement..." 
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                      SYSTEM_VERSION
+                    </label>
+                    <input 
+                      type="text" 
+                      value={bioSysVer}
+                      onChange={(e) => setBioSysVer(e.target.value)}
+                      className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
+                      placeholder="4.2.0"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                      STATUS
+                    </label>
+                    <input 
+                      type="text" 
+                      value={bioStatus}
+                      onChange={(e) => setBioStatus(e.target.value)}
+                      className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
+                      placeholder="ONLINE"
+                    />
+                  </div>
+                </div>
+
+                {/* Profile Photo */}
+                <div className="space-y-2">
+                  <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                    PROFILE_PHOTO_UPLOAD
+                  </label>
+                  <div className="border-2 border-dashed border-outline/50 rounded-lg p-6 text-center hover:border-secondary/70 hover:bg-secondary/5 transition-all cursor-pointer flex flex-col items-center justify-center gap-2 relative">
+                    <input 
+                      type="file" 
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setBioPhotoFile(e.target.files[0]);
+                        }
+                      }}
+                      accept=".png,.jpg,.jpeg"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <span className="material-symbols-outlined text-secondary opacity-70">photo_camera</span>
+                    <span className="font-technical-sm text-technical-sm text-on-surface-variant block">
+                      {bioPhotoFile ? bioPhotoFile.name : 'Choose profile image file'}
+                    </span>
+                    <span className="font-label-caps text-label-caps text-outline-variant block mt-2">
+                      SUPPORTS: PNG, JPG (MAX 5MB)
+                    </span>
+                  </div>
+                  {bioPhotoUrl && !bioPhotoFile && (
+                    <div className="text-[10px] font-technical-sm text-secondary truncate mt-1">
+                      CURRENT: {bioPhotoUrl}
+                    </div>
+                  )}
+                </div>
+
+                {/* Core Competencies Edit */}
+                <div className="space-y-4 border-t border-outline/25 pt-4">
+                  <div className="font-label-caps text-[10px] text-secondary tracking-widest">
+                    [ COMPETENCY_DATA ]
+                  </div>
+                  
+                  <div className="grid grid-cols-12 gap-3 items-center">
+                    <input 
+                      type="text" 
+                      value={comp1Name}
+                      onChange={(e) => setComp1Name(e.target.value)}
+                      className="col-span-8 bg-surface-container/50 border border-outline/50 rounded text-technical-sm text-primary p-2" 
+                      placeholder="Competency 1" 
+                    />
+                    <input 
+                      type="number" 
+                      value={comp1Value}
+                      onChange={(e) => setComp1Value(parseInt(e.target.value || '0'))}
+                      className="col-span-4 bg-surface-container/50 border border-outline/50 rounded text-technical-sm text-primary p-2" 
+                      min="0" max="100"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-12 gap-3 items-center">
+                    <input 
+                      type="text" 
+                      value={comp2Name}
+                      onChange={(e) => setComp2Name(e.target.value)}
+                      className="col-span-8 bg-surface-container/50 border border-outline/50 rounded text-technical-sm text-primary p-2" 
+                      placeholder="Competency 2" 
+                    />
+                    <input 
+                      type="number" 
+                      value={comp2Value}
+                      onChange={(e) => setComp2Value(parseInt(e.target.value || '0'))}
+                      className="col-span-4 bg-surface-container/50 border border-outline/50 rounded text-technical-sm text-primary p-2" 
+                      min="0" max="100"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-12 gap-3 items-center">
+                    <input 
+                      type="text" 
+                      value={comp3Name}
+                      onChange={(e) => setComp3Name(e.target.value)}
+                      className="col-span-8 bg-surface-container/50 border border-outline/50 rounded text-technical-sm text-primary p-2" 
+                      placeholder="Competency 3" 
+                    />
+                    <input 
+                      type="number" 
+                      value={comp3Value}
+                      onChange={(e) => setComp3Value(parseInt(e.target.value || '0'))}
+                      className="col-span-4 bg-surface-container/50 border border-outline/50 rounded text-technical-sm text-primary p-2" 
+                      min="0" max="100"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-outline/30 flex justify-end gap-4">
+                  <button 
+                    type="submit" 
+                    disabled={bioLoading}
+                    className="font-technical-sm text-technical-sm text-surface bg-secondary px-6 py-2 rounded hover:shadow-[0_0_15px_rgba(176,198,255,0.5)] transition-all font-bold cursor-pointer disabled:opacity-50"
+                  >
+                    {bioLoading ? 'UPDATING...' : 'UPDATE_BIODATA'}
                   </button>
                 </div>
               </form>

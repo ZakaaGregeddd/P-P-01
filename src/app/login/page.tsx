@@ -260,6 +260,13 @@ export default function LoginPage() {
       return;
     }
 
+    if (!adminId) {
+      setError('Administrator Email Required');
+      setEyeState('cynical');
+      setPupilTarget({ x: 50, y: 28 });
+      return;
+    }
+
     if (!password) {
       setError('Clearance Code Required');
       setEyeState('cynical');
@@ -269,7 +276,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await login(password);
+      const res = await login(adminId, password);
       if (res.success) {
         setEyeState('happy');
         setPupilTarget({ x: 50, y: 20 }); // pupil looks up-center happily
@@ -343,14 +350,14 @@ export default function LoginPage() {
             {/* Input Group */}
             <div className="space-y-1 relative group">
               <label className="block font-technical-sm text-technical-sm text-primary uppercase tracking-widest" htmlFor="admin-id">
-                Administrator ID
+                Administrator Email
               </label>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10 text-[18px]">
-                  badge
+                  mail
                 </span>
                 <input 
-                  type="text" 
+                  type="email" 
                   id="admin-id" 
                   name="admin-id" 
                   value={adminId}
@@ -358,7 +365,7 @@ export default function LoginPage() {
                   onFocus={() => handleFocus('id')}
                   onBlur={handleBlur}
                   disabled={isLocked}
-                  placeholder="ADM-XXXX" 
+                  placeholder="admin@grd.port" 
                   className="w-full bg-surface-container-low/50 border border-outline-variant/50 text-primary font-technical-sm text-technical-sm py-2.5 pl-10 pr-4 rounded-none focus:ring-0 focus:border-secondary transition-all duration-300 glow-focus placeholder-on-surface-variant/30 disabled:opacity-30 disabled:cursor-not-allowed"
                 />
               </div>

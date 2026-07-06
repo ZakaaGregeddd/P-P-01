@@ -7,13 +7,14 @@ import { getCollection } from '@/lib/db';
 import { ObjectId } from 'mongodb';
 
 // Authenticate Admin
-export async function login(password: string) {
+export async function login(email: string, password: string) {
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@grd.port';
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) {
     return { success: false, error: 'ADMIN_PASSWORD environment variable not set' };
   }
 
-  if (password === adminPassword) {
+  if (email === adminEmail && password === adminPassword) {
     const cookieStore = await cookies();
     cookieStore.set('admin_session', 'authenticated', {
       httpOnly: true,
@@ -25,7 +26,7 @@ export async function login(password: string) {
     return { success: true };
   }
 
-  return { success: false, error: 'Clearance Code Invalid' };
+  return { success: false, error: 'Clearance Code or Email Invalid' };
 }
 
 // Log Out Admin
@@ -118,3 +119,72 @@ export async function deleteCertificate(id: string) {
     return { success: false, error: `Deletion failed: ${err.message}` };
   }
 }
+
+// Update Biodata
+export async function updateBiodata(formData: FormData) {
+  const cookieStore = await cookies();
+  if (!cookieStore.has('admin_session')) {
+    throw new Error('Unauthorized');
+  }
+
+  const name = formData.get('name') as string;
+  const designation = formData.get('designation') as string;
+  const specialization = formData.get('specialization') as string;
+  const statement = formData.get('statement') as string;
+  const sysVer = formData.get('sysVer') as string;
+  const status = formData.get('status') as string;
+  const photoFile = formData.get('photoFile') as File | null;
+  let photoUrl = formData.get('photoUrl') as string || '';
+
+  // Core Competencies
+  const comp1Name = formData.get('comp1Name') as string;
+  const comp1Value = parseInt(formData.get('comp1Value') as string || '0');
+  const comp2Name = formData.get('comp2Name') as string;
+  const comp2Value = parseInt(formData.get('comp2Value') as string || '0');
+  const comp3Name = formData.get('comp3Name') as string;
+  const comp3Value = parseInt(formData.get('comp3Value') as string || '0');
+
+  if (photoFile && photoFile.size > 0) {
+    try {
+      // Upload file to Vercel Blob
+      const blob = await put(photoFile.name, photoFile, {
+        access: 'public',
+      });
+      photoUrl = blob.url;
+    } catch (err: any) {
+      return { success: false, error: `Photo upload failed: ${err.message}` };
+    }
+  }
+
+  try {
+    const collection = await getCollection('biodata');
+    await collection.updateOne(
+      { key: 'admin_biodata' },
+      {
+        $set: {
+          name,
+          designation,
+          specialization,
+          statement,
+          sysVer,
+          status,
+          photoUrl,
+          competencies: [
+            { name: comp1Name, value: comp1Value },
+            { name: comp2Name, value: comp2Value },
+            { name: comp3Name, value: comp3Value },
+          ],
+          updatedAt: new Date().toISOString(),
+        }
+      },
+      { upsert: true }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: `Database update failed: ${err.message}` };
+  }
+}
+

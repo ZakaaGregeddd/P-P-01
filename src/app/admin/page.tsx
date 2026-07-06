@@ -32,5 +32,25 @@ export default async function AdminPage() {
     fileSize: cert.fileSize || 0,
   }));
 
-  return <AdminDashboard initialCerts={initialCerts} />;
+  let initialBiodata = null;
+  try {
+    const biodataCollection = await getCollection('biodata');
+    const bioDoc = await biodataCollection.findOne({ key: 'admin_biodata' });
+    if (bioDoc) {
+      initialBiodata = {
+        name: bioDoc.name || '',
+        designation: bioDoc.designation || '',
+        specialization: bioDoc.specialization || '',
+        statement: bioDoc.statement || '',
+        sysVer: bioDoc.sysVer || '',
+        status: bioDoc.status || '',
+        photoUrl: bioDoc.photoUrl || '',
+        competencies: bioDoc.competencies || []
+      };
+    }
+  } catch (err) {
+    console.error('Failed to load admin biodata:', err);
+  }
+
+  return <AdminDashboard initialCerts={initialCerts} initialBiodata={initialBiodata} />;
 }
