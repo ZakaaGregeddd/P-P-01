@@ -7,6 +7,14 @@ interface CertificatesClientProps {
   initialCerts: Certificate[];
 }
 
+const formatBytes = (bytes?: number) => {
+  if (!bytes) return '';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+};
+
 export default function CertificatesClient({ initialCerts }: CertificatesClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL_CATEGORIES');
@@ -83,19 +91,33 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
         <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
           {featuredCerts.map((cert, index) => {
             const formattedDate = cert.dateIssued.replace(/-/g, '.');
+            const isPdf = cert.fileUrl && cert.fileUrl.toLowerCase().endsWith('.pdf');
             const bgImage = cert.fileUrl && cert.fileUrl.match(/\.(jpeg|jpg|gif|png|webp)/i)
               ? cert.fileUrl
               : featuredFallbacks[index % 3];
 
             return (
-              <article key={`feat-${cert._id}`} className="glass-panel glow-hover p-5 flex flex-col group cursor-pointer h-full border-t-2 border-t-secondary/40 hover:scale-[1.02] transition-all duration-300">
+              <article 
+                key={`feat-${cert._id}`} 
+                onClick={() => cert.fileUrl && window.open(cert.fileUrl, '_blank')}
+                className="glass-panel glow-hover p-5 flex flex-col group cursor-pointer h-full border-t-2 border-t-secondary/40 hover:scale-[1.02] transition-all duration-300 relative"
+              >
                 <div className="mb-4 relative w-full pt-[45%] bg-surface-container overflow-hidden">
-                  <img 
-                    alt={cert.name} 
-                    className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-700 scale-110 group-hover:scale-100 grayscale group-hover:grayscale-0" 
-                    src={bgImage}
-                  />
-                  <div className="absolute inset-0 border-2 border-secondary/20 m-2 pointer-events-none"></div>
+                  {isPdf ? (
+                    <iframe 
+                      src={`${cert.fileUrl}#page=1&toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                      className="absolute top-0 left-0 w-[calc(100%+28px)] h-full border-none pointer-events-none opacity-60 group-hover:opacity-100 transition-all duration-700 scale-110 group-hover:scale-100"
+                      title={cert.name}
+                      scrolling="no"
+                    />
+                  ) : (
+                    <img 
+                      alt={cert.name} 
+                      className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-700 scale-110 group-hover:scale-100 grayscale group-hover:grayscale-0" 
+                      src={bgImage}
+                    />
+                  )}
+                  <div className="absolute inset-0 border-2 border-secondary/20 m-2 pointer-events-none z-10"></div>
                 </div>
                 <div className="flex-grow flex flex-col">
                   <div className="flex justify-between items-start mb-2">
@@ -115,7 +137,7 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
                     Verifiable qualification credential indexing {cert.name.toLowerCase()} competencies and professional architecture compliance.
                   </p>
                   <div className="mt-auto pt-3.5 border-t border-outline-variant/30 flex justify-between font-technical-sm text-[10px] text-outline">
-                    <span>VALIDATED: {formattedDate}</span>
+                    <span>VALIDATED: {formattedDate}{cert.fileSize ? ` // ${formatBytes(cert.fileSize)}` : ''}</span>
                     <span className="text-secondary font-bold uppercase">{index === 0 ? 'RECENT_ENTRY' : index === 1 ? 'CORE_CREDENTIAL' : 'SYSTEMS_EXPERT'}</span>
                   </div>
                 </div>
@@ -219,7 +241,7 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
                 </div>
                 <div className="relative z-10">
                   <div className="dimension-line mb-2 opacity-30"></div>
-                  <span className="font-technical-sm text-[10px] text-on-surface-variant">{formattedDate}</span>
+                  <span className="font-technical-sm text-[10px] text-on-surface-variant">{formattedDate}{cert.fileSize ? ` // ${formatBytes(cert.fileSize)}` : ''}</span>
                 </div>
               </div>
             );

@@ -45,5 +45,6 @@ export interface Certificate {
   credentialId: string;
   status: 'active' | 'expired';
   fileUrl: string;
+  fileSize?: number;
   createdAt: string;
 }

@@ -54,8 +54,10 @@ export async function addCertificate(formData: FormData) {
   }
 
   let fileUrl = '';
+  let fileSize = 0;
   if (file && file.size > 0) {
     try {
+      fileSize = file.size;
       // Upload file to Vercel Blob
       const blob = await put(file.name, file, {
         access: 'public',
@@ -75,6 +77,7 @@ export async function addCertificate(formData: FormData) {
       credentialId,
       status: status || 'active',
       fileUrl,
+      fileSize,
       createdAt: new Date().toISOString(),
     });
 

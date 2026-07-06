@@ -12,6 +12,7 @@ interface AdminCert {
   credentialId: string;
   status: 'active' | 'expired';
   fileUrl: string;
+  fileSize?: number;
 }
 
 export default function AdminDashboard({ initialCerts }: { initialCerts: AdminCert[] }) {

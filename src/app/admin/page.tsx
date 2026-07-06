@@ -29,6 +29,7 @@ export default async function AdminPage() {
     credentialId: cert.credentialId,
     status: cert.status || 'active',
     fileUrl: cert.fileUrl || '',
+    fileSize: cert.fileSize || 0,
   }));
 
   return <AdminDashboard initialCerts={initialCerts} />;
