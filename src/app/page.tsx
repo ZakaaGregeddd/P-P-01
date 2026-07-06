@@ -19,7 +19,7 @@ export default function Home() {
           
           {/* Speculative Engineering Hero (Top part) */}
           <div className="flex flex-col gap-4">
-            <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-headline-md lg:text-3xl xl:text-display-lg text-primary uppercase tracking-tighter">
+            <h1 className="font-headline-md text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-primary uppercase tracking-tighter font-bold leading-[0.9]">
               Speculative<br />Engineering
             </h1>
             

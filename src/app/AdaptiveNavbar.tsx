@@ -6,21 +6,35 @@ import { usePathname, useRouter } from 'next/navigation';
 
 export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [isExtended, setIsExtended] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
   // Handle manual transformation
   const toggleNav = () => {
     setIsExtended(!isExtended);
+    if (isExtended) {
+      setIsMobileMenuOpen(false);
+    }
   };
 
-  // Optional: Auto-toggle on scroll
+  const handleMinimize = () => {
+    setIsExtended(false);
+    setIsMobileMenuOpen(false);
+  };
+
   useEffect(() => {
+    // Minimize navbar by default on mobile screens for cleaner spatial layouts
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsExtended(false);
+    }
+
     const handleScroll = () => {
       const currentScroll = window.scrollY;
       if (currentScroll > 100) {
         setIsExtended(false);
-      } else if (currentScroll < 50) {
+        setIsMobileMenuOpen(false);
+      } else if (currentScroll < 50 && typeof window !== 'undefined' && window.innerWidth >= 768) {
         setIsExtended(true);
       }
     };
@@ -75,25 +89,76 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
           </nav>
         </div>
         
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           <span className="font-technical-sm text-[11px] text-secondary tracking-widest opacity-80 hidden lg:inline">
             SYS.STATUS // ACTIVE
           </span>
           <a
             href="mailto:admin@architex.v1"
-            className="bg-secondary text-primary font-label-caps text-label-caps px-5 py-2.5 hover:shadow-[0_0_20px_rgba(0,112,255,0.6)] transition-all duration-300"
+            className="bg-secondary text-primary font-label-caps text-label-caps px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm hover:shadow-[0_0_20px_rgba(0,112,255,0.6)] transition-all duration-300"
           >
             Contact
           </a>
+
+          {/* Hamburger Menu Button for Mobile Dropdown */}
+          <button
+            className="p-2 text-primary hover:text-secondary transition-colors cursor-pointer flex items-center md:hidden border border-white/10"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle mobile menu"
+          >
+            <span className="material-symbols-outlined text-[20px]">
+              {isMobileMenuOpen ? 'close' : 'menu'}
+            </span>
+          </button>
+
           <button
             className="p-2 text-primary hover:text-secondary transition-colors cursor-pointer flex items-center"
-            onClick={toggleNav}
+            onClick={handleMinimize}
             aria-label="Minimize navigation"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span className="material-symbols-outlined text-[20px]">expand_less</span>
           </button>
         </div>
       </header>
+
+      {/* Mobile Dropdown Menu */}
+      <div
+        className={`fixed left-0 w-full bg-surface/95 backdrop-blur-2xl border-b border-secondary/20 shadow-[0_15px_30px_rgba(0,112,255,0.15)] z-40 transition-all duration-300 transform md:hidden ${
+          isExtended && isMobileMenuOpen 
+            ? 'top-20 opacity-100 translate-y-0' 
+            : 'top-20 -translate-y-4 opacity-0 pointer-events-none'
+        }`}
+      >
+        <nav className="flex flex-col py-2">
+          <Link
+            href="/"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`font-label-caps text-label-caps tracking-[0.15em] py-3.5 px-margin-mobile border-b border-white/5 transition-colors ${
+              pathname === '/' ? 'text-secondary bg-white/5' : 'text-on-surface-variant hover:text-secondary'
+            }`}
+          >
+            Home
+          </Link>
+          <Link
+            href="/certificates"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`font-label-caps text-label-caps tracking-[0.15em] py-3.5 px-margin-mobile border-b border-white/5 transition-colors ${
+              pathname === '/certificates' ? 'text-secondary bg-white/5' : 'text-on-surface-variant hover:text-secondary'
+            }`}
+          >
+            Certificates
+          </Link>
+          <Link
+            href={isLoggedIn ? '/admin' : '/login'}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`font-label-caps text-label-caps tracking-[0.15em] py-3.5 px-margin-mobile transition-colors ${
+              pathname === '/login' || pathname === '/admin' ? 'text-secondary bg-white/5' : 'text-on-surface-variant hover:text-secondary'
+            }`}
+          >
+            {isLoggedIn ? 'Admin' : 'Login'}
+          </Link>
+        </nav>
+      </div>
 
       {/* Minimized State (Floating Pill) */}
       <div

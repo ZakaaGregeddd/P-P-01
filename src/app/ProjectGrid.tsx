@@ -37,8 +37,8 @@ export default function ProjectGrid() {
         data-id="proj-1"
         className={`md:col-span-8 glass-panel p-6 glow-hover group flex flex-col justify-between min-h-[400px] transition-all duration-[800ms] ease-out transform relative ${
           visibleItems['proj-1']
-            ? 'opacity-100 translate-x-0'
-            : 'opacity-0 -translate-x-16 pointer-events-none'
+            ? 'opacity-100 translate-x-0 translate-y-0'
+            : 'opacity-0 md:-translate-x-16 translate-y-8 pointer-events-none'
         }`}
       >
         {/* Animated Border Overlay - Triggers on Hover */}
@@ -72,8 +72,8 @@ export default function ProjectGrid() {
         data-id="proj-2"
         className={`md:col-span-4 glass-panel p-6 glow-hover group flex flex-col justify-between min-h-[400px] transition-all duration-[800ms] ease-out delay-[200ms] transform relative ${
           visibleItems['proj-2']
-            ? 'opacity-100 translate-x-0'
-            : 'opacity-0 translate-x-16 pointer-events-none'
+            ? 'opacity-100 translate-x-0 translate-y-0'
+            : 'opacity-0 md:translate-x-16 translate-y-8 pointer-events-none'
         }`}
       >
         {/* Animated Border Overlay - Triggers on Hover */}

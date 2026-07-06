@@ -197,7 +197,7 @@ export default function WelcomeLava() {
       {/* Centered Welcome text container */}
       <div className="relative w-full h-[calc(100vh-80px)] min-h-[500px] flex flex-col items-center justify-center select-none z-20">
         {/* Transparent glass backdrop for readability, but allows liquid to overlay */}
-        <div className="bg-background/10 backdrop-blur-[2px] p-8 border border-white/5 shadow-2xl relative group min-w-[320px] md:min-w-[600px] text-center flex items-center justify-center h-48">
+        <div className="bg-background/10 backdrop-blur-[2px] p-8 border border-white/5 shadow-2xl relative group min-w-[280px] sm:min-w-[320px] md:min-w-[600px] text-center flex items-center justify-center h-48">
           {/* Corner brackets */}
           <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-primary/40"></div>
           <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-primary/40"></div>
@@ -206,7 +206,7 @@ export default function WelcomeLava() {
 
           <h1 
             style={glitchStyle}
-            className="font-display-lg text-primary text-headline-lg md:text-[80px] lg:text-[100px] font-bold uppercase tracking-widest leading-none drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] min-h-[1em]"
+            className="font-display-lg text-primary text-4xl sm:text-5xl md:text-[80px] lg:text-[100px] font-bold uppercase tracking-widest leading-none drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] min-h-[1em]"
           >
             {displayedText}
           </h1>
