@@ -188,3 +188,58 @@ export async function updateBiodata(formData: FormData) {
   }
 }
 
+// Update Project
+export async function updateProject(formData: FormData) {
+  const cookieStore = await cookies();
+  if (!cookieStore.has('admin_session')) {
+    throw new Error('Unauthorized');
+  }
+
+  const projectId = formData.get('projectId') as string;
+  const tag = formData.get('tag') as string;
+  const title = formData.get('title') as string;
+  const description = formData.get('description') as string;
+  const linkUrl = formData.get('linkUrl') as string;
+  const imageFile = formData.get('imageFile') as File | null;
+  let imageUrl = formData.get('imageUrl') as string || '';
+
+  if (!projectId || !tag || !title || !description || !linkUrl) {
+    return { success: false, error: 'All fields are required' };
+  }
+
+  if (imageFile && imageFile.size > 0) {
+    try {
+      const blob = await put(imageFile.name, imageFile, {
+        access: 'public',
+      });
+      imageUrl = blob.url;
+    } catch (err: any) {
+      return { success: false, error: `Image upload failed: ${err.message}` };
+    }
+  }
+
+  try {
+    const collection = await getCollection('projects');
+    await collection.updateOne(
+      { projectId },
+      {
+        $set: {
+          tag,
+          title,
+          description,
+          linkUrl,
+          imageUrl,
+          updatedAt: new Date().toISOString(),
+        }
+      },
+      { upsert: true }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: `Database update failed: ${err.message}` };
+  }
+}
+

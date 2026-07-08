@@ -52,5 +52,27 @@ export default async function AdminPage() {
     console.error('Failed to load admin biodata:', err);
   }
 
-  return <AdminDashboard initialCerts={initialCerts} initialBiodata={initialBiodata} />;
+  let initialProjects: any[] = [];
+  try {
+    const projectsCollection = await getCollection('projects');
+    const dbProjects = await projectsCollection.find({}).toArray();
+    initialProjects = dbProjects.map((p) => ({
+      projectId: p.projectId,
+      tag: p.tag || '',
+      title: p.title || '',
+      description: p.description || '',
+      imageUrl: p.imageUrl || '',
+      linkUrl: p.linkUrl || '',
+    }));
+  } catch (err) {
+    console.error('Failed to load admin projects list:', err);
+  }
+
+  return (
+    <AdminDashboard 
+      initialCerts={initialCerts} 
+      initialBiodata={initialBiodata} 
+      initialProjects={initialProjects} 
+    />
+  );
 }

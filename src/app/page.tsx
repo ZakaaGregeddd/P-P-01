@@ -28,6 +28,22 @@ export default async function Home() {
     { name: "Structural Analysis", value: 91 }
   ];
 
+  let projects: any[] = [];
+  try {
+    const projectsCollection = await getCollection('projects');
+    const dbProjects = await projectsCollection.find({}).toArray();
+    projects = dbProjects.map(p => ({
+      projectId: p.projectId,
+      tag: p.tag || '',
+      title: p.title || '',
+      description: p.description || '',
+      imageUrl: p.imageUrl || '',
+      linkUrl: p.linkUrl || '',
+    }));
+  } catch (err) {
+    console.error('Failed to load projects on home page:', err);
+  }
+
   return (
     <div className="relative w-full overflow-hidden">
       <WelcomeLava />
@@ -42,10 +58,10 @@ export default async function Home() {
           {/* Decorative drafting lines */}
           <div className="absolute -left-12 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-secondary/30 to-transparent hidden md:block"></div>
           
-          {/* Speculative Engineering Hero (Top part) */}
+          {/* (Top part) */}
           <div className="flex flex-col gap-4">
             <h1 className="font-headline-md text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-primary uppercase tracking-tighter font-bold leading-[0.9]">
-              Speculative<br />Engineering
+              Be<br />Creative
             </h1>
             
             <div className="h-px w-full bg-outline-variant/30 dimension-line relative my-1">
@@ -55,7 +71,7 @@ export default async function Home() {
             </div>
             
             <p className="font-body-base text-sm text-on-surface-variant max-w-xl">
-              Crafting digital structures with mathematical precision and ethereal depth. A portfolio of high-fidelity prototypes, systems architectures, and interactive schematics.
+              Creativity knows no bounds, lets Breaking the boundaries of system and imagination. Transforming limitless imagination into functional digital realities and compelling visual narratives. 
             </p>
             
             <div className="flex gap-4 mt-1">
@@ -63,7 +79,7 @@ export default async function Home() {
                 href="/certificates" 
                 className="bg-secondary text-primary px-6 py-2.5 font-label-caps text-label-caps tracking-widest hover:shadow-[0_0_20px_rgba(0,112,255,0.5)] transition-all flex items-center gap-2 w-fit"
               >
-                <span>VIEW BLUEPRINTS</span>
+                <span>VIEW ACHIEVEMENTS</span>
                 <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
               </Link>
             </div>
@@ -169,11 +185,11 @@ export default async function Home() {
       {/* Featured Projects Grid */}
       <section className="flex flex-col gap-12">
         <div className="flex justify-between items-end border-b border-outline-variant/30 pb-4">
-          <h2 className="font-headline-md text-headline-md text-primary tracking-tight">FEATURED SCHEMATICS</h2>
+          <h2 className="font-headline-md text-headline-md text-primary tracking-tight">WHAT'S IM DOING NOW?</h2>
           <div className="font-technical-sm text-technical-sm text-secondary">DATA.SET // 01-02</div>
         </div>
         
-        <ProjectGrid />
+        <ProjectGrid initialProjects={projects} />
       </section>
     </div>
     </div>
