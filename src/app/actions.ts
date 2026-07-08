@@ -62,6 +62,7 @@ export async function addCertificate(formData: FormData) {
       // Upload file to Vercel Blob
       const blob = await put(file.name, file, {
         access: 'public',
+        addRandomSuffix: true,
       });
       fileUrl = blob.url;
     } catch (err: any) {
@@ -149,6 +150,7 @@ export async function updateBiodata(formData: FormData) {
       // Upload file to Vercel Blob
       const blob = await put(photoFile.name, photoFile, {
         access: 'public',
+        addRandomSuffix: true,
       });
       photoUrl = blob.url;
     } catch (err: any) {
@@ -213,6 +215,7 @@ export async function updateProject(formData: FormData) {
         const fileObj = imageFile as File;
         const blob = await put(fileObj.name, fileObj, {
           access: 'public',
+          addRandomSuffix: true,
         });
         imageUrl = blob.url;
       } catch (err: any) {

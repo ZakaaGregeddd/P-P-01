@@ -105,7 +105,7 @@ export default function ProjectGrid({
           <span className="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
         </div>
         
-        <div className="relative w-full h-48 bg-surface-container-lowest mb-6 overflow-hidden z-10">
+        <div className={`relative w-full bg-surface-container-lowest mb-6 overflow-hidden z-10 transition-all duration-500 ease-in-out ${isProj2Hovered ? 'h-32' : 'h-48'}`}>
           <Image 
             src={proj1.imageUrl}
             alt={proj1.title}
@@ -119,7 +119,7 @@ export default function ProjectGrid({
         
         <div className="relative z-10">
           <h3 className="font-headline-md text-headline-md text-primary mb-2">{proj1.title}</h3>
-          <p className="font-body-base text-body-base text-on-surface-variant max-w-2xl">
+          <p className={`font-body-base text-body-base text-on-surface-variant max-w-2xl transition-all duration-300 ${isProj2Hovered ? 'line-clamp-1 text-sm' : 'line-clamp-3'}`}>
             {proj1.description}
           </p>
         </div>
@@ -152,7 +152,7 @@ export default function ProjectGrid({
           <span className="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
         </div>
         
-        <div className="relative w-full h-32 bg-surface-container-lowest mb-4 overflow-hidden border border-outline-variant/20 z-10">
+        <div className={`relative w-full bg-surface-container-lowest mb-4 overflow-hidden border border-outline-variant/20 z-10 transition-all duration-500 ease-in-out ${isProj2Hovered ? 'h-48' : 'h-32'}`}>
           <Image 
             src={proj2.imageUrl}
             alt={proj2.title}
@@ -164,7 +164,7 @@ export default function ProjectGrid({
         
         <div className="relative z-10">
           <h3 className="font-headline-md text-[24px] leading-[32px] text-primary mb-2">{proj2.title}</h3>
-          <p className="font-body-base text-body-base text-on-surface-variant text-sm">
+          <p className={`font-body-base text-body-base text-on-surface-variant transition-all duration-300 ${isProj2Hovered ? 'line-clamp-3' : 'line-clamp-1 text-sm'}`}>
             {proj2.description}
           </p>
         </div>
