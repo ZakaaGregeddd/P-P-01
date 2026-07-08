@@ -47,6 +47,15 @@ export default function ProjectGrid({
     };
   }, []);
 
+  const getDirectGDriveUrl = (url: string) => {
+    if (!url) return '';
+    const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+      return `https://lh3.googleusercontent.com/d/${match[1]}`;
+    }
+    return url;
+  };
+
   const proj1Data = initialProjects.find(p => p.projectId === 'proj-1');
   const proj2Data = initialProjects.find(p => p.projectId === 'proj-2');
 
@@ -55,7 +64,7 @@ export default function ProjectGrid({
     title: proj1Data?.title || 'Neural Pathway Mapping',
     description: proj1Data?.description || 'High-density data visualization system conceptualized for mapping complex associative networks.',
     linkUrl: proj1Data?.linkUrl || '/projects/neural-pathway',
-    imageUrl: proj1Data?.imageUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuB7LtYjfirw2hK3RG-Xo5um7WLXaKwxJCaF7MS9JUL6hg4E68_gHj_btiSFcI3toAV83_3_1Ne7UVqwfXT2yXC9dTHL-GkDaQDA8JZBOPeiJrnkhJ8GE7sc0JvFidkqFBl6Oi3oqs7SefIDoQULaWPos6P79oZtU1c_SMWqjFTNyffLAqWegrQziFRqp9ux2MDps5rBs8AZ_A6_RzF0ZvCra2fhfdXNcn_HOzZAhjRSY7aUtCbN-oM'
+    imageUrl: getDirectGDriveUrl(proj1Data?.imageUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuB7LtYjfirw2hK3RG-Xo5um7WLXaKwxJCaF7MS9JUL6hg4E68_gHj_btiSFcI3toAV83_3_1Ne7UVqwfXT2yXC9dTHL-GkDaQDA8JZBOPeiJrnkhJ8GE7sc0JvFidkqFBl6Oi3oqs7SefIDoQULaWPos6P79oZtU1c_SMWqjFTNyffLAqWegrQziFRqp9ux2MDps5rBs8AZ_A6_RzF0ZvCra2fhfdXNcn_HOzZAhjRSY7aUtCbN-oM')
   };
 
   const proj2 = {
@@ -63,7 +72,7 @@ export default function ProjectGrid({
     title: proj2Data?.title || 'Void Terminal',
     description: proj2Data?.description || 'Command line interface redesign focusing on cognitive offloading.',
     linkUrl: proj2Data?.linkUrl || '/projects/void-terminal',
-    imageUrl: proj2Data?.imageUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuBsGpYQQnihiuoyOEwkpyV5zE_C-BoPuC1KONYQ7LMwYSCTI2o8bPwosHPejqCGQ2PCCcxfTpQXUtdLrpAMdQBsO-KPBg4S6Dmo9K63mC2YbYkTFss57VB_2bYDpvK7RBb9dreqUBn9VD-f91FqiBVdSTHIwnH-b7uZU6T0o92d62Wqmhvv6tLQnTWfUvalZRa_qkoFsa4niweyaxHn6KMAxnlx63_Zulkt8AqX_x7YsjXSbwDJo5g'
+    imageUrl: getDirectGDriveUrl(proj2Data?.imageUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuBsGpYQQnihiuoyOEwkpyV5zE_C-BoPuC1KONYQ7LMwYSCTI2o8bPwosHPejqCGQ2PCCcxfTpQXUtdLrpAMdQBsO-KPBg4S6Dmo9K63mC2YbYkTFss57VB_2bYDpvK7RBb9dreqUBn9VD-f91FqiBVdSTHIwnH-b7uZU6T0o92d62Wqmhvv6tLQnTWfUvalZRa_qkoFsa4niweyaxHn6KMAxnlx63_Zulkt8AqX_x7YsjXSbwDJo5g')
   };
 
   return (
