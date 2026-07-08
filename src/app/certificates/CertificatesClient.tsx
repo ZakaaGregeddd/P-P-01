@@ -136,7 +136,7 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
                   </div>
                   <p className="font-technical-sm text-technical-sm text-secondary-container mb-2 tracking-wider uppercase">{cert.issuer}</p>
                   <p className="font-body-base text-xs text-on-surface-variant line-clamp-2 mb-3">
-                    Verifiable qualification credential indexing {cert.name.toLowerCase()} competencies and professional architecture compliance.
+                    {cert.description || `Verifiable qualification credential indexing ${cert.name.toLowerCase()} competencies and professional architecture compliance.`}
                   </p>
                   <div className="mt-auto pt-3.5 border-t border-outline-variant/30 flex justify-between font-technical-sm text-[10px] text-outline">
                     <span>VALIDATED: {formattedDate}{cert.fileSize ? ` // ${formatBytes(cert.fileSize)}` : ''}</span>

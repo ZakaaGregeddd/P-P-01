@@ -48,6 +48,7 @@ export async function addCertificate(formData: FormData) {
   const dateIssued = formData.get('dateIssued') as string;
   const credentialId = formData.get('credentialId') as string;
   const status = formData.get('status') as 'active' | 'expired';
+  const description = formData.get('description') as string || '';
   const file = formData.get('file') as File;
 
   if (!name || !issuer || !dateIssued || !credentialId) {
@@ -80,6 +81,7 @@ export async function addCertificate(formData: FormData) {
       status: status || 'active',
       fileUrl,
       fileSize,
+      description,
       createdAt: new Date().toISOString(),
     });
 

@@ -25,6 +25,7 @@ export default async function AdminPage() {
         status: 1,
         fileUrl: 1,
         fileSize: 1,
+        description: 1,
         createdAt: 1
       })
       .sort({ dateIssued: -1 })
@@ -42,6 +43,7 @@ export default async function AdminPage() {
     status: cert.status || 'active',
     fileUrl: cert.fileUrl || '',
     fileSize: cert.fileSize || 0,
+    description: cert.description || '',
   }));
 
   let initialBiodata = null;

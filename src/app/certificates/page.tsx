@@ -15,6 +15,7 @@ export default async function CertificatesPage() {
         credentialId: 1,
         status: 1,
         fileUrl: 1,
+        description: 1,
         createdAt: 1
       })
       .sort({ dateIssued: -1 })
@@ -29,6 +30,7 @@ export default async function CertificatesPage() {
       credentialId: doc.credentialId,
       status: doc.status || 'active',
       fileUrl: doc.fileUrl || '',
+      description: doc.description || '',
       createdAt: doc.createdAt || new Date().toISOString(),
     }));
   } catch (err) {

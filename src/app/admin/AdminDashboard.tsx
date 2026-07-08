@@ -50,6 +50,7 @@ export default function AdminDashboard({
   const [dateIssued, setDateIssued] = useState('');
   const [credentialId, setCredentialId] = useState('');
   const [status, setStatus] = useState<'active' | 'expired'>('active');
+  const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
 
   const [loading, setLoading] = useState(false);
@@ -179,6 +180,7 @@ export default function AdminDashboard({
     formData.append('dateIssued', dateIssued);
     formData.append('credentialId', credentialId);
     formData.append('status', status);
+    formData.append('description', description);
     if (file) {
       formData.append('file', file);
     }
@@ -192,6 +194,7 @@ export default function AdminDashboard({
         setDateIssued('');
         setCredentialId('');
         setStatus('active');
+        setDescription('');
         setFile(null);
         // Reset file input element manually
         const fileInput = document.getElementById('asset-upload') as HTMLInputElement;
@@ -331,7 +334,7 @@ export default function AdminDashboard({
           {/* Active Tab Panel */}
           <div className="flex-1 min-w-0">
             {activeTab === 'profile' && (
-              <div className="max-w-4xl glass-panel rounded-lg p-6 glow-effect transition-all duration-300">
+              <div className="max-w-4xl glass-panel rounded-lg p-4 sm:p-6 glow-effect transition-all duration-300">
                 <div className="flex items-center justify-between mb-6 border-b border-outline/30 pb-4 relative z-10">
                   <h2 className="font-technical-sm text-technical-sm text-primary tracking-wider">
                     SYSTEM_CONFIG // BIODATA_EDIT
@@ -556,7 +559,7 @@ export default function AdminDashboard({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
                   {/* PROJ 1 Form */}
-                  <div className="glass-panel rounded-lg p-6 glow-effect transition-all duration-300">
+                  <div className="glass-panel rounded-lg p-4 sm:p-6 glow-effect transition-all duration-300">
                     <div className="flex items-center justify-between mb-6 border-b border-outline/30 pb-4 relative z-10">
                       <h3 className="font-technical-sm text-technical-sm text-primary tracking-wider">
                         NODE_01 // PROJ_01 (LARGE_PANEL)
@@ -649,7 +652,7 @@ export default function AdminDashboard({
                   </div>
 
                   {/* PROJ 2 Form */}
-                  <div className="glass-panel rounded-lg p-6 glow-effect transition-all duration-300">
+                  <div className="glass-panel rounded-lg p-4 sm:p-6 glow-effect transition-all duration-300">
                     <div className="flex items-center justify-between mb-6 border-b border-outline/30 pb-4 relative z-10">
                       <h3 className="font-technical-sm text-technical-sm text-primary tracking-wider">
                         NODE_02 // PROJ_02 (SMALL_PANEL)
@@ -748,7 +751,7 @@ export default function AdminDashboard({
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
                 {/* Input Section: Add New Certificate */}
                 <div className="lg:col-span-5 flex flex-col gap-6">
-                  <div className="glass-panel rounded-lg p-6 glow-effect transition-all duration-300">
+                  <div className="glass-panel rounded-lg p-4 sm:p-6 glow-effect transition-all duration-300">
                     <div className="flex items-center justify-between mb-6 border-b border-outline/30 pb-4 relative z-10">
                       <h2 className="font-technical-sm text-technical-sm text-primary tracking-wider">
                         INPUT_NODE // ADD_CERT
@@ -836,6 +839,19 @@ export default function AdminDashboard({
                       
                       <div className="space-y-2">
                         <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                          DESCRIPTION
+                        </label>
+                        <textarea 
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          rows={2}
+                          className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
+                          placeholder="Brief description of credentials..."
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="font-label-caps text-label-caps text-on-surface-variant block">
                           ASSET_UPLOAD
                         </label>
                         <div className="border-2 border-dashed border-outline/50 rounded-lg p-6 text-center hover:border-secondary/70 hover:bg-secondary/5 transition-all cursor-pointer flex flex-col items-center justify-center gap-2 relative">
@@ -864,6 +880,7 @@ export default function AdminDashboard({
                             setIssuer('');
                             setDateIssued('');
                             setCredentialId('');
+                            setDescription('');
                             setFile(null);
                           }}
                           className="font-technical-sm text-technical-sm text-on-surface-variant px-4 py-2 border border-outline/50 rounded hover:text-primary hover:border-primary transition-all cursor-pointer"

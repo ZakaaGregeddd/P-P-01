@@ -46,5 +46,6 @@ export interface Certificate {
   status: 'active' | 'expired';
   fileUrl: string;
   fileSize?: number;
+  description?: string;
   createdAt: string;
 }
