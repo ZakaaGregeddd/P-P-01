@@ -16,7 +16,19 @@ export default async function AdminPage() {
   let dbCerts: any[] = [];
   try {
     const collection = await getCollection('certificates');
-    dbCerts = await collection.find({}).sort({ dateIssued: -1 }).toArray();
+    dbCerts = await collection.find({})
+      .project({
+        name: 1,
+        issuer: 1,
+        dateIssued: 1,
+        credentialId: 1,
+        status: 1,
+        fileUrl: 1,
+        fileSize: 1,
+        createdAt: 1
+      })
+      .sort({ dateIssued: -1 })
+      .toArray();
   } catch (err) {
     console.error('Failed to load admin certificates list:', err);
   }

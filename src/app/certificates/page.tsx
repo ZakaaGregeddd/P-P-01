@@ -7,7 +7,18 @@ export default async function CertificatesPage() {
   let certificates: Certificate[] = [];
   try {
     const collection = await getCollection('certificates');
-    const dbCerts = await collection.find({}).sort({ dateIssued: -1 }).toArray();
+    const dbCerts = await collection.find({})
+      .project({
+        name: 1,
+        issuer: 1,
+        dateIssued: 1,
+        credentialId: 1,
+        status: 1,
+        fileUrl: 1,
+        createdAt: 1
+      })
+      .sort({ dateIssued: -1 })
+      .toArray();
     
     // Map Mongo docs to Certificate objects and serialize IDs
     certificates = dbCerts.map(doc => ({
