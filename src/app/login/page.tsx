@@ -6,10 +6,10 @@ import Link from 'next/link';
 import { login } from '../actions';
 
 // Simple Windows Hello Style AI Eye
-function AiEye({ 
-  state, 
-  pupilTarget 
-}: { 
+function AiEye({
+  state,
+  pupilTarget
+}: {
   state: 'idle' | 'focus_id' | 'focus_password' | 'cynical' | 'angry' | 'blinking' | 'happy';
   pupilTarget: { x: number; y: number };
 }) {
@@ -50,7 +50,7 @@ function AiEye({
       blinkTimerRef.current = setTimeout(() => {
         setIsBlinking(false);
       }, 150);
-      
+
       const nextBlinkTime = 3000 + Math.random() * 5000;
       blinkTimerRef.current = setTimeout(triggerBlink, nextBlinkTime);
     };
@@ -83,8 +83,8 @@ function AiEye({
 
   return (
     <div className={`w-20 h-10 mx-auto relative ${isShaking ? 'animate-pulse' : ''}`}>
-      <svg 
-        viewBox="0 0 100 40" 
+      <svg
+        viewBox="0 0 100 40"
         className="w-full h-full"
         style={{
           filter: `drop-shadow(0 0 4px ${eyeColor}80)`,
@@ -93,29 +93,29 @@ function AiEye({
       >
         {/* Simple floating Pupil (No outer clipping or sclera socket) */}
         {/* Glowing outer iris circle */}
-        <circle 
-          cx={pupil.x} 
-          cy={pupil.y} 
-          r="9" 
-          fill={eyeColor} 
-          opacity={isBlinking ? "0.05" : "0.22"} 
+        <circle
+          cx={pupil.x}
+          cy={pupil.y}
+          r="9"
+          fill={eyeColor}
+          opacity={isBlinking ? "0.05" : "0.22"}
           className="transition-all duration-150"
         />
         {/* Simple clean center pupil */}
-        <circle 
-          cx={pupil.x} 
-          cy={pupil.y} 
-          r={isBlinking ? "0" : (state === 'angry' ? "3" : "4.5")} 
-          fill={eyeColor} 
+        <circle
+          cx={pupil.x}
+          cy={pupil.y}
+          r={isBlinking ? "0" : (state === 'angry' ? "3" : "4.5")}
+          fill={eyeColor}
           className="transition-all duration-150"
         />
 
         {/* Minimal thin single eyebrow line */}
-        <path 
-          d={topEyelidPath} 
-          fill="none" 
-          stroke={eyeColor} 
-          strokeWidth="2.2" 
+        <path
+          d={topEyelidPath}
+          fill="none"
+          stroke={eyeColor}
+          strokeWidth="2.2"
           strokeLinecap="round"
           className="transition-all duration-150 ease-out"
         />
@@ -139,7 +139,7 @@ export default function LoginPage() {
   const [eyeState, setEyeState] = useState<'idle' | 'focus_id' | 'focus_password' | 'cynical' | 'angry' | 'happy'>('idle');
   const [pupilTarget, setPupilTarget] = useState({ x: 50, y: 25 });
   const [isMouseClose, setIsMouseClose] = useState(false);
-  
+
   // Easter Egg Alarm Mode States
   const [failedLockouts, setFailedLockouts] = useState(0);
   const [isAlarmMode, setIsAlarmMode] = useState(false);
@@ -147,7 +147,7 @@ export default function LoginPage() {
   const [alarmCountdown, setAlarmCountdown] = useState(15);
   const [buttonOffset, setButtonOffset] = useState({ x: 0, y: 0 });
   const [isButtonShaking, setIsButtonShaking] = useState(false);
-  
+
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
   const eyeContainerRef = useRef<HTMLDivElement>(null);
 
@@ -222,16 +222,16 @@ export default function LoginPage() {
 
   const handleAbortClick = () => {
     if (abortProgress >= 100) return;
-    
+
     // Play spark sound
     playElectricSparkSound();
-    
+
     // Trigger button shake visual feedback
     setIsButtonShaking(true);
     const rx = (Math.random() - 0.5) * 14;
     const ry = (Math.random() - 0.5) * 14;
     setButtonOffset({ x: rx, y: ry });
-    
+
     setTimeout(() => {
       setButtonOffset({ x: 0, y: 0 });
       setIsButtonShaking(false);
@@ -250,13 +250,13 @@ export default function LoginPage() {
       setAttempts(0);
       setAbortProgress(0);
       setIsAlarmMode(false);
-      
+
       // Increment completed alarm count in localStorage
       if (typeof window !== 'undefined') {
         const currentCompleted = parseInt(localStorage.getItem('siaga-merah-count') || '0', 10);
         localStorage.setItem('siaga-merah-count', (currentCompleted + 1).toString());
       }
-      
+
       // Reload to home
       window.location.href = '/';
     }
@@ -283,11 +283,11 @@ export default function LoginPage() {
         setIsMouseClose(true);
         const nx = dx / distance;
         const ny = dy / distance;
-        
+
         // Pupil X ranges from 40 to 60, Pupil Y ranges from 18 to 32
         const targetX = 50 + nx * 10;
         const targetY = 25 + ny * 7;
-        
+
         setPupilTarget({ x: targetX, y: targetY });
       } else {
         setIsMouseClose(false);
@@ -355,7 +355,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (lockoutTime > 0) {
       setError(`ACCESS DENIED: LOCKED OUT FOR ${lockoutTime}s`);
       return;
@@ -393,15 +393,15 @@ export default function LoginPage() {
         if (nextAttempts >= 3) {
           const nextFailedLockouts = failedLockouts + 1;
           setFailedLockouts(nextFailedLockouts);
-          
+
           if (nextFailedLockouts >= 2) {
             // Log this alarm trigger time into history
             let alarmHistory: number[] = [];
             if (typeof window !== 'undefined') {
               try {
                 alarmHistory = JSON.parse(localStorage.getItem('siaga-merah-history') || '[]');
-              } catch (e) {}
-              
+              } catch (e) { }
+
               const now = Date.now();
               alarmHistory.push(now);
               localStorage.setItem('siaga-merah-history', JSON.stringify(alarmHistory));
@@ -439,7 +439,7 @@ export default function LoginPage() {
           setError(res.error || 'Access Denied');
           setEyeState('cynical');
           setPupilTarget({ x: 50, y: 28 });
-          
+
           setTimeout(() => {
             setEyeState(prev => prev === 'cynical' ? 'idle' : prev);
           }, 3500);
@@ -469,18 +469,18 @@ export default function LoginPage() {
       {/* Login Card Container */}
       <div className={`w-full max-w-md my-2 ${isAlarmMode ? 'z-[10000]' : 'z-10'}`}>
         <div className={`glass-panel rounded-none py-5 px-6 shadow-2xl relative transition-all duration-500 ${isAlarmMode ? 'border-[#ff3b30] shadow-[0_0_35px_rgba(255,59,48,0.5)] animate-pulse' : ''}`}>
-          
+
           {/* Minimal Windows Hello Style Eye Widget */}
           <div ref={eyeContainerRef} className="mb-1">
             <AiEye state={eyeState} pupilTarget={pupilTarget} />
           </div>
-          
+
           <div className="mb-4 text-center">
             <h1 className="font-headline-md text-headline-md text-primary mb-1 tracking-tight">
               {isAlarmMode ? 'SYSTEM THREAT' : 'System Access'}
             </h1>
             <p className={`font-technical-sm text-technical-sm uppercase tracking-widest ${isAlarmMode ? 'text-error' : 'text-on-surface-variant'}`}>
-              {isAlarmMode ? 'OVERRIDE STATE // INTRUSION' : 'Authentication Protocol // V.04'}
+              {isAlarmMode ? 'OVERRIDE STATE // INTRUSION' : 'Authentication Protocol // V.3.2'}
             </p>
           </div>
 
@@ -488,8 +488,8 @@ export default function LoginPage() {
             {isAlarmMode ? (
               <div className="space-y-4">
                 <div className="border border-error bg-error/15 text-error p-3 rounded-none text-technical-sm font-technical-sm tracking-wider uppercase text-center animate-pulse font-bold">
-                  {alarmCountdown > 0 
-                    ? `ALERT: CALLING ADMINISTRATOR IN ${alarmCountdown}S...` 
+                  {alarmCountdown > 0
+                    ? `ALERT: CALLING ADMINISTRATOR IN ${alarmCountdown}S...`
                     : 'ADMIN CALLED // DISPATCHING SIGNAL LOCATION TRACKER'}
                 </div>
 
@@ -500,14 +500,14 @@ export default function LoginPage() {
                 <div className="pt-2">
                   {/* Progress Bar */}
                   <div className="w-full bg-surface-container-low h-2 border border-outline-variant/30 relative overflow-hidden mb-3">
-                    <div 
-                      className="bg-red-500 h-full transition-all duration-75 shadow-[0_0_10px_rgba(239,68,68,0.7)]" 
+                    <div
+                      className="bg-red-500 h-full transition-all duration-75 shadow-[0_0_10px_rgba(239,68,68,0.7)]"
                       style={{ width: `${abortProgress}%` }}
                     ></div>
                   </div>
 
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={handleAbortClick}
                     style={{
                       transform: `translate(${buttonOffset.x}px, ${buttonOffset.y}px)`,
@@ -516,8 +516,8 @@ export default function LoginPage() {
                     className="w-full border-2 border-red-500 bg-red-600/20 text-red-500 font-label-caps text-label-caps py-4 rounded-none tracking-widest hover:bg-red-600 hover:text-white transition-all duration-200 glow-hover relative overflow-hidden group cursor-pointer shadow-[0_0_20px_rgba(239,68,68,0.5)] active:scale-95"
                   >
                     <span className="relative z-10 uppercase font-bold text-[11px]">
-                      {abortProgress < 100 
-                        ? `ABORT PROTOCOL [PROGRESS: ${Math.floor(abortProgress)}%]` 
+                      {abortProgress < 100
+                        ? `ABORT PROTOCOL [PROGRESS: ${Math.floor(abortProgress)}%]`
                         : 'PROTOCOL ABORTED'}
                     </span>
                   </button>
@@ -526,11 +526,10 @@ export default function LoginPage() {
             ) : (
               <>
                 {error && (
-                  <div className={`border p-2.5 rounded-none text-technical-sm font-technical-sm tracking-wider uppercase text-center transition-all ${
-                    isLocked 
-                      ? 'border-error bg-error/15 text-error animate-pulse font-bold' 
+                  <div className={`border p-2.5 rounded-none text-technical-sm font-technical-sm tracking-wider uppercase text-center transition-all ${isLocked
+                      ? 'border-error bg-error/15 text-error animate-pulse font-bold'
                       : 'border-error/50 bg-error/10 text-error'
-                  }`}>
+                    }`}>
                     {isLocked ? `LOCKED OUT: ${lockoutTime}S` : `ERROR: ${error}`}
                   </div>
                 )}
@@ -544,16 +543,16 @@ export default function LoginPage() {
                     <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10 text-[18px]">
                       mail
                     </span>
-                    <input 
-                      type="email" 
-                      id="admin-id" 
-                      name="admin-id" 
+                    <input
+                      type="email"
+                      id="admin-id"
+                      name="admin-id"
                       value={adminId}
                       onChange={(e) => setAdminId(e.target.value)}
                       onFocus={() => handleFocus('id')}
                       onBlur={handleBlur}
                       disabled={isLocked}
-                      placeholder="admin@grd.port" 
+                      placeholder="admin@grd.port"
                       className="w-full bg-surface-container-low/50 border border-outline-variant/50 text-primary font-technical-sm text-technical-sm py-2.5 pl-10 pr-4 rounded-none focus:ring-0 focus:border-secondary transition-all duration-300 glow-focus placeholder-on-surface-variant/30 disabled:opacity-30 disabled:cursor-not-allowed"
                     />
                   </div>
@@ -568,16 +567,16 @@ export default function LoginPage() {
                     <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10 text-[18px]">
                       key
                     </span>
-                    <input 
-                      type="password" 
-                      id="admin-pass" 
-                      name="admin-pass" 
+                    <input
+                      type="password"
+                      id="admin-pass"
+                      name="admin-pass"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       onFocus={() => handleFocus('password')}
                       onBlur={handleBlur}
                       disabled={isLocked}
-                      placeholder="••••••••" 
+                      placeholder="••••••••"
                       className="w-full bg-surface-container-low/50 border border-outline-variant/50 text-primary font-technical-sm text-technical-sm py-2.5 pl-10 pr-4 rounded-none focus:ring-0 focus:border-secondary transition-all duration-300 glow-focus placeholder-on-surface-variant/30 disabled:opacity-30 disabled:cursor-not-allowed"
                     />
                   </div>
@@ -585,8 +584,8 @@ export default function LoginPage() {
 
                 {/* Actions */}
                 <div className="pt-1 flex flex-col space-y-3">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={loading || isLocked}
                     className="w-full bg-[#0070FF] text-white font-label-caps text-label-caps py-2.5 rounded-none tracking-widest hover:bg-[#005bb5] transition-all duration-300 glow-hover relative overflow-hidden group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -595,10 +594,10 @@ export default function LoginPage() {
                     </span>
                     <div className="absolute inset-0 h-full w-0 bg-white/10 transition-all duration-300 ease-out group-hover:w-full z-0"></div>
                   </button>
-                  
+
                   <div className="flex justify-center mt-3">
-                    <Link 
-                      href="/" 
+                    <Link
+                      href="/"
                       className="font-technical-sm text-technical-sm text-on-surface-variant hover:text-secondary transition-colors inline-flex items-center gap-2 group"
                     >
                       <span className="material-symbols-outlined text-[14px] group-hover:-translate-x-1 transition-transform">
