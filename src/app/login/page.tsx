@@ -251,6 +251,12 @@ export default function LoginPage() {
       setAbortProgress(0);
       setIsAlarmMode(false);
       
+      // Increment completed alarm count in localStorage
+      if (typeof window !== 'undefined') {
+        const currentCompleted = parseInt(localStorage.getItem('siaga-merah-count') || '0', 10);
+        localStorage.setItem('siaga-merah-count', (currentCompleted + 1).toString());
+      }
+      
       // Reload to home
       window.location.href = '/';
     }
@@ -389,6 +395,30 @@ export default function LoginPage() {
           setFailedLockouts(nextFailedLockouts);
           
           if (nextFailedLockouts >= 2) {
+            // Log this alarm trigger time into history
+            let alarmHistory: number[] = [];
+            if (typeof window !== 'undefined') {
+              try {
+                alarmHistory = JSON.parse(localStorage.getItem('siaga-merah-history') || '[]');
+              } catch (e) {}
+              
+              const now = Date.now();
+              alarmHistory.push(now);
+              localStorage.setItem('siaga-merah-history', JSON.stringify(alarmHistory));
+
+              // Filter for alarms triggered on the same calendar day (today)
+              const todayStr = new Date().toDateString();
+              const todayAlarms = alarmHistory.filter((t: number) => new Date(t).toDateString() === todayStr);
+
+              // If this is the 2nd (or more) alarm today, ban them for 30 minutes!
+              if (todayAlarms.length >= 2) {
+                const banExpiryTime = now + 30 * 60 * 1000;
+                localStorage.setItem('ban-expires', banExpiryTime.toString());
+                window.location.reload();
+                return;
+              }
+            }
+
             setIsAlarmMode(true);
             setEyeState('angry');
             setPupilTarget({ x: 50, y: 25 });

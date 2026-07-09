@@ -6,6 +6,7 @@ import LavaBackground from "./LavaBackground";
 import GlobalLoader from "./GlobalLoader";
 import MusicPlayer from "./MusicPlayer";
 import EnergyGridBackground from "./EnergyGridBackground";
+import BannedPortal from "./BannedPortal";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
       <body className="bg-background text-on-background font-body-base min-h-screen blueprint-grid relative flex flex-col justify-between selection:bg-secondary/30 selection:text-primary">
+        <BannedPortal>
         {/* Global Loading Screen Overlay */}
         <GlobalLoader />
 
@@ -79,6 +81,7 @@ export default async function RootLayout({
             <Link href="#" className="hover:text-secondary opacity-75 hover:opacity-100 transition-opacity">Privacy</Link>
           </div>
         </footer>
+      </BannedPortal>
       </body>
     </html>
   );
