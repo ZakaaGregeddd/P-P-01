@@ -9,24 +9,43 @@ export default function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    // Load preferences from localStorage on mount (client-side only)
+    const savedVolStr = localStorage.getItem('music-volume');
+    const savedPlayStr = localStorage.getItem('music-playing');
+    
+    let initialVolume = 0.15;
+    if (savedVolStr !== null) {
+      initialVolume = parseFloat(savedVolStr);
+      setVolume(initialVolume);
+    }
+    
+    let initialPlaying = true;
+    if (savedPlayStr !== null) {
+      initialPlaying = savedPlayStr === 'true';
+      setIsPlaying(initialPlaying);
+    }
+
     // Use the custom local Cyberpunk OST file
     const audio = new Audio('/music/Hyper - Spoiler Cyberpunk 2077 OST.mp3');
     audio.loop = true;
-    audio.volume = volume;
+    audio.volume = initialVolume;
     audioRef.current = audio;
 
-    // Handle initial play (might be blocked by browser policies)
+    // Handle initial play if enabled by preference
     const playAttempt = () => {
-      audio.play().catch(() => {
-        console.debug('Autoplay blocked. Waiting for user interaction to resume.');
-      });
+      if (initialPlaying) {
+        audio.play().catch(() => {
+          console.debug('Autoplay blocked. Waiting for user interaction to resume.');
+        });
+      }
     };
 
     playAttempt();
 
     // Add interactive listener to unlock audio playback once user clicks anywhere
     const unlockAudio = () => {
-      if (audioRef.current && audioRef.current.paused) {
+      const shouldPlay = localStorage.getItem('music-playing') !== 'false';
+      if (shouldPlay && audioRef.current && audioRef.current.paused) {
         audioRef.current.play().catch(() => {});
       }
       window.removeEventListener('click', unlockAudio);
@@ -48,6 +67,7 @@ export default function MusicPlayer() {
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
+      localStorage.setItem('music-volume', volume.toString());
     }
   }, [volume]);
 
@@ -58,9 +78,11 @@ export default function MusicPlayer() {
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
+      localStorage.setItem('music-playing', 'false');
     } else {
       audioRef.current.play().catch(() => {});
       setIsPlaying(true);
+      localStorage.setItem('music-playing', 'true');
     }
   };
 

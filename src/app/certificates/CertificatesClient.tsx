@@ -158,10 +158,10 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
           </div>
           
           {/* Technical Filter Bar */}
-          <div className="glass-panel p-2 flex flex-wrap gap-2 items-center">
+          <div className="glass-panel p-1.5 flex flex-wrap gap-1.5 items-center">
             <div className="relative group">
               <input 
-                className="font-technical-sm text-technical-sm pl-8 pr-4 py-2 w-full md:w-64" 
+                className="font-technical-sm text-[10px] pl-7 pr-3 py-1.5 w-full md:w-48" 
                 placeholder="SEARCH_DATABASE..." 
                 type="text"
                 value={searchQuery}
@@ -170,11 +170,11 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
                   setCurrentPage(1);
                 }}
               />
-              <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+              <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-[13px]">search</span>
             </div>
             
             <select 
-              className="font-technical-sm text-technical-sm px-4 py-2 pr-8 appearance-none bg-no-repeat bg-[right_0.5rem_center] cursor-pointer"
+              className="font-technical-sm text-[10px] px-3 py-1.5 pr-7 appearance-none bg-no-repeat bg-[right_0.5rem_center] cursor-pointer"
               value={selectedCategory}
               onChange={(e) => {
                 setSelectedCategory(e.target.value);
@@ -187,10 +187,10 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
               <option value="COMPUTATIONAL">COMPUTATIONAL</option>
             </select>
             
-            <div className="flex items-center gap-2 glass-panel px-3 py-2 border-none">
-              <span className="font-technical-sm text-outline text-[10px]">RANGE:</span>
+            <div className="flex items-center gap-1.5 glass-panel px-2 py-1 border-none">
+              <span className="font-technical-sm text-outline text-[9px]">RANGE:</span>
               <input 
-                className="font-technical-sm text-xs border-none bg-transparent p-0 w-24 focus:ring-0 focus:border-none focus:outline-none" 
+                className="font-technical-sm text-[10px] border-none bg-transparent p-0 w-20 focus:ring-0 focus:border-none focus:outline-none" 
                 type="date"
                 value={startDate}
                 onChange={(e) => {
@@ -200,7 +200,7 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
               />
               <span className="text-outline text-xs">-</span>
               <input 
-                className="font-technical-sm text-xs border-none bg-transparent p-0 w-24 focus:ring-0 focus:border-none focus:outline-none" 
+                className="font-technical-sm text-[10px] border-none bg-transparent p-0 w-20 focus:ring-0 focus:border-none focus:outline-none" 
                 type="date"
                 value={endDate}
                 onChange={(e) => {

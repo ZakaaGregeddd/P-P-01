@@ -39,7 +39,7 @@ export default function YouTubeGrid({ videos = [] }: { videos: VideoData[] }) {
   return (
     <div 
       ref={gridRef}
-      className="grid grid-cols-1 md:grid-cols-2 gap-gutter overflow-hidden"
+      className="grid grid-cols-1 md:grid-cols-2 gap-gutter p-1"
     >
       {videos.map((video, idx) => {
         const dataId = `yt-${idx}`;
@@ -49,7 +49,7 @@ export default function YouTubeGrid({ videos = [] }: { videos: VideoData[] }) {
           <div 
             key={video.id}
             data-id={dataId}
-            className={`glass-panel p-5 relative group hover:border-secondary/40 transition-all duration-[800ms] ease-out transform flex flex-col gap-4 ${
+            className={`glass-panel p-5 relative group glow-hover hover:border-secondary/40 transition-all duration-[800ms] ease-out transform flex flex-col gap-4 ${
               isLeft ? 'delay-[0ms]' : 'delay-[200ms]'
             } ${
               visibleItems[dataId]
