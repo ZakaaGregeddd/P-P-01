@@ -5,6 +5,7 @@ import AdaptiveNavbar from "./AdaptiveNavbar";
 import LavaBackground from "./LavaBackground";
 import GlobalLoader from "./GlobalLoader";
 import MusicPlayer from "./MusicPlayer";
+import EnergyGridBackground from "./EnergyGridBackground";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -39,6 +40,9 @@ export default async function RootLayout({
 
         {/* Global Lava Lamp Background Animation */}
         <LavaBackground />
+
+        {/* Global Ambient Breathing Energy Grid Lines Overlay */}
+        <EnergyGridBackground />
 
         {/* Grid Overlay Guide (Development/Aesthetic) */}
         <div className="fixed inset-0 pointer-events-none z-0 hidden md:flex justify-between px-margin-desktop opacity-[0.03]">
