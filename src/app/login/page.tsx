@@ -124,6 +124,8 @@ function AiEye({
   );
 }
 
+import { playElectricSparkSound } from '@/lib/sfx';
+
 export default function LoginPage() {
   const router = useRouter();
   const [adminId, setAdminId] = useState('');
@@ -138,8 +140,26 @@ export default function LoginPage() {
   const [pupilTarget, setPupilTarget] = useState({ x: 50, y: 25 });
   const [isMouseClose, setIsMouseClose] = useState(false);
   
+  // Easter Egg Alarm Mode States
+  const [failedLockouts, setFailedLockouts] = useState(0);
+  const [isAlarmMode, setIsAlarmMode] = useState(false);
+  const [abortProgress, setAbortProgress] = useState(0);
+  const [alarmCountdown, setAlarmCountdown] = useState(15);
+  const [buttonOffset, setButtonOffset] = useState({ x: 0, y: 0 });
+  const [isButtonShaking, setIsButtonShaking] = useState(false);
+  
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
   const eyeContainerRef = useRef<HTMLDivElement>(null);
+
+  // Cleanup body class and stop alarm on unmount
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('alarm-mode');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('stop-alarm'));
+      }
+    };
+  }, []);
 
   // Lockout Countdown
   useEffect(() => {
@@ -160,6 +180,68 @@ export default function LoginPage() {
 
     return () => clearInterval(timer);
   }, [lockoutTime]);
+
+  // Alarm Mode Countdown Timer
+  useEffect(() => {
+    if (!isAlarmMode || alarmCountdown <= 0) return;
+
+    const timer = setInterval(() => {
+      setAlarmCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isAlarmMode, alarmCountdown]);
+
+  // Alarm Mode Progress Drainer (runs when user is not clicking)
+  useEffect(() => {
+    if (!isAlarmMode) return;
+    const drainTimer = setInterval(() => {
+      setAbortProgress(prev => Math.max(0, prev - 1.5));
+    }, 80);
+    return () => clearInterval(drainTimer);
+  }, [isAlarmMode]);
+
+  const handleAbortClick = () => {
+    if (abortProgress >= 100) return;
+    
+    // Play spark sound
+    playElectricSparkSound();
+    
+    // Trigger button shake visual feedback
+    setIsButtonShaking(true);
+    const rx = (Math.random() - 0.5) * 14;
+    const ry = (Math.random() - 0.5) * 14;
+    setButtonOffset({ x: rx, y: ry });
+    
+    setTimeout(() => {
+      setButtonOffset({ x: 0, y: 0 });
+      setIsButtonShaking(false);
+    }, 85);
+
+    const nextProgress = Math.min(100, abortProgress + 12);
+    setAbortProgress(nextProgress);
+
+    if (nextProgress >= 100) {
+      // Clear alert and play success state
+      document.body.classList.remove('alarm-mode');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('stop-alarm'));
+      }
+      setFailedLockouts(0);
+      setAttempts(0);
+      setAbortProgress(0);
+      setIsAlarmMode(false);
+      
+      // Reload to home
+      window.location.href = '/';
+    }
+  };
 
   // Track Mouse Cursor and look directly at it if it's too close (under 180px)
   useEffect(() => {
@@ -290,10 +372,26 @@ export default function LoginPage() {
         setAttempts(nextAttempts);
 
         if (nextAttempts >= 3) {
-          setLockoutTime(15);
-          setEyeState('angry');
-          setPupilTarget({ x: 50, y: 25 });
-          setError('SECURITY PROTOCOL ENABLED: 15S LOCKOUT ACTIVE');
+          const nextFailedLockouts = failedLockouts + 1;
+          setFailedLockouts(nextFailedLockouts);
+          
+          if (nextFailedLockouts >= 2) {
+            setIsAlarmMode(true);
+            setEyeState('angry');
+            setPupilTarget({ x: 50, y: 25 });
+            setAbortProgress(0);
+            setAlarmCountdown(15);
+            setError('CRITICAL BREACH: COGNITIVE OVERRIDE INITIATED');
+            document.body.classList.add('alarm-mode');
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('trigger-alarm'));
+            }
+          } else {
+            setLockoutTime(15);
+            setEyeState('angry');
+            setPupilTarget({ x: 50, y: 25 });
+            setError('SECURITY PROTOCOL ENABLED: 15S LOCKOUT ACTIVE');
+          }
         } else {
           setError(res.error || 'Access Denied');
           setEyeState('cynical');
@@ -322,7 +420,7 @@ export default function LoginPage() {
 
       {/* Login Card Container */}
       <div className="w-full max-w-md z-10 my-2">
-        <div className="glass-panel rounded-none py-5 px-6 shadow-2xl relative">
+        <div className={`glass-panel rounded-none py-5 px-6 shadow-2xl relative transition-all duration-500 ${isAlarmMode ? 'border-[#ff3b30] shadow-[0_0_35px_rgba(255,59,48,0.5)] animate-pulse' : ''}`}>
           
           {/* Minimal Windows Hello Style Eye Widget */}
           <div ref={eyeContainerRef} className="mb-1">
@@ -330,96 +428,140 @@ export default function LoginPage() {
           </div>
           
           <div className="mb-4 text-center">
-            <h1 className="font-headline-md text-headline-md text-primary mb-1 tracking-tight">System Access</h1>
-            <p className="font-technical-sm text-technical-sm text-on-surface-variant uppercase tracking-widest">
-              Authentication Protocol // V.04
+            <h1 className="font-headline-md text-headline-md text-primary mb-1 tracking-tight">
+              {isAlarmMode ? 'SYSTEM THREAT' : 'System Access'}
+            </h1>
+            <p className={`font-technical-sm text-technical-sm uppercase tracking-widest ${isAlarmMode ? 'text-error' : 'text-on-surface-variant'}`}>
+              {isAlarmMode ? 'OVERRIDE STATE // INTRUSION' : 'Authentication Protocol // V.04'}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {error && (
-              <div className={`border p-2.5 rounded-none text-technical-sm font-technical-sm tracking-wider uppercase text-center transition-all ${
-                isLocked 
-                  ? 'border-error bg-error/15 text-error animate-pulse font-bold' 
-                  : 'border-error/50 bg-error/10 text-error'
-              }`}>
-                {isLocked ? `LOCKED OUT: ${lockoutTime}S` : `ERROR: ${error}`}
+          <form onSubmit={isAlarmMode ? (e) => e.preventDefault() : handleSubmit} className="space-y-3">
+            {isAlarmMode ? (
+              <div className="space-y-4">
+                <div className="border border-error bg-error/15 text-error p-3 rounded-none text-technical-sm font-technical-sm tracking-wider uppercase text-center animate-pulse font-bold">
+                  {alarmCountdown > 0 
+                    ? `ALERT: CALLING ADMINISTRATOR IN ${alarmCountdown}S...` 
+                    : 'ADMIN CALLED // DISPATCHING SIGNAL LOCATION TRACKER'}
+                </div>
+
+                <div className="text-center font-technical-sm text-[10px] text-outline uppercase tracking-wide leading-relaxed p-2.5 bg-surface-container-low border border-outline-variant/30">
+                  COGNITIVE SHIELD DEVIATION INITIATED. ALL PORTS CLOSED. CLICK ABORT CONTROLLER TO TERMINATE PROTOCOL.
+                </div>
+
+                <div className="pt-2">
+                  {/* Progress Bar */}
+                  <div className="w-full bg-surface-container-low h-2 border border-outline-variant/30 relative overflow-hidden mb-3">
+                    <div 
+                      className="bg-red-500 h-full transition-all duration-75 shadow-[0_0_10px_rgba(239,68,68,0.7)]" 
+                      style={{ width: `${abortProgress}%` }}
+                    ></div>
+                  </div>
+
+                  <button 
+                    type="button" 
+                    onClick={handleAbortClick}
+                    style={{
+                      transform: `translate(${buttonOffset.x}px, ${buttonOffset.y}px)`,
+                      transition: isButtonShaking ? 'none' : 'transform 0.15s ease-out'
+                    }}
+                    className="w-full border-2 border-red-500 bg-red-600/20 text-red-500 font-label-caps text-label-caps py-4 rounded-none tracking-widest hover:bg-red-600 hover:text-white transition-all duration-200 glow-hover relative overflow-hidden group cursor-pointer shadow-[0_0_20px_rgba(239,68,68,0.5)] active:scale-95"
+                  >
+                    <span className="relative z-10 uppercase font-bold text-[11px]">
+                      {abortProgress < 100 
+                        ? `ABORT PROTOCOL [PROGRESS: ${Math.floor(abortProgress)}%]` 
+                        : 'PROTOCOL ABORTED'}
+                    </span>
+                  </button>
+                </div>
               </div>
+            ) : (
+              <>
+                {error && (
+                  <div className={`border p-2.5 rounded-none text-technical-sm font-technical-sm tracking-wider uppercase text-center transition-all ${
+                    isLocked 
+                      ? 'border-error bg-error/15 text-error animate-pulse font-bold' 
+                      : 'border-error/50 bg-error/10 text-error'
+                  }`}>
+                    {isLocked ? `LOCKED OUT: ${lockoutTime}S` : `ERROR: ${error}`}
+                  </div>
+                )}
+
+                {/* Input Group */}
+                <div className="space-y-1 relative group">
+                  <label className="block font-technical-sm text-technical-sm text-primary uppercase tracking-widest" htmlFor="admin-id">
+                    Administrator Email
+                  </label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10 text-[18px]">
+                      mail
+                    </span>
+                    <input 
+                      type="email" 
+                      id="admin-id" 
+                      name="admin-id" 
+                      value={adminId}
+                      onChange={(e) => setAdminId(e.target.value)}
+                      onFocus={() => handleFocus('id')}
+                      onBlur={handleBlur}
+                      disabled={isLocked}
+                      placeholder="admin@grd.port" 
+                      className="w-full bg-surface-container-low/50 border border-outline-variant/50 text-primary font-technical-sm text-technical-sm py-2.5 pl-10 pr-4 rounded-none focus:ring-0 focus:border-secondary transition-all duration-300 glow-focus placeholder-on-surface-variant/30 disabled:opacity-30 disabled:cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+
+                {/* Input Group */}
+                <div className="space-y-1 relative group">
+                  <label className="block font-technical-sm text-technical-sm text-primary uppercase tracking-widest" htmlFor="admin-pass">
+                    Security Clearance
+                  </label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10 text-[18px]">
+                      key
+                    </span>
+                    <input 
+                      type="password" 
+                      id="admin-pass" 
+                      name="admin-pass" 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onFocus={() => handleFocus('password')}
+                      onBlur={handleBlur}
+                      disabled={isLocked}
+                      placeholder="••••••••" 
+                      className="w-full bg-surface-container-low/50 border border-outline-variant/50 text-primary font-technical-sm text-technical-sm py-2.5 pl-10 pr-4 rounded-none focus:ring-0 focus:border-secondary transition-all duration-300 glow-focus placeholder-on-surface-variant/30 disabled:opacity-30 disabled:cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="pt-1 flex flex-col space-y-3">
+                  <button 
+                    type="submit" 
+                    disabled={loading || isLocked}
+                    className="w-full bg-[#0070FF] text-white font-label-caps text-label-caps py-2.5 rounded-none tracking-widest hover:bg-[#005bb5] transition-all duration-300 glow-hover relative overflow-hidden group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span className="relative z-10 uppercase">
+                      {loading ? 'INITIALIZING HANDSHAKE...' : isLocked ? 'HANDSHAKE SUSPENDED' : 'INITIALIZE LOGIN'}
+                    </span>
+                    <div className="absolute inset-0 h-full w-0 bg-white/10 transition-all duration-300 ease-out group-hover:w-full z-0"></div>
+                  </button>
+                  
+                  <div className="flex justify-center mt-3">
+                    <Link 
+                      href="/" 
+                      className="font-technical-sm text-technical-sm text-on-surface-variant hover:text-secondary transition-colors inline-flex items-center gap-2 group"
+                    >
+                      <span className="material-symbols-outlined text-[14px] group-hover:-translate-x-1 transition-transform">
+                        arrow_left_alt
+                      </span>
+                      Return to Main Interface
+                    </Link>
+                  </div>
+                </div>
+              </>
             )}
-
-            {/* Input Group */}
-            <div className="space-y-1 relative group">
-              <label className="block font-technical-sm text-technical-sm text-primary uppercase tracking-widest" htmlFor="admin-id">
-                Administrator Email
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10 text-[18px]">
-                  mail
-                </span>
-                <input 
-                  type="email" 
-                  id="admin-id" 
-                  name="admin-id" 
-                  value={adminId}
-                  onChange={(e) => setAdminId(e.target.value)}
-                  onFocus={() => handleFocus('id')}
-                  onBlur={handleBlur}
-                  disabled={isLocked}
-                  placeholder="admin@grd.port" 
-                  className="w-full bg-surface-container-low/50 border border-outline-variant/50 text-primary font-technical-sm text-technical-sm py-2.5 pl-10 pr-4 rounded-none focus:ring-0 focus:border-secondary transition-all duration-300 glow-focus placeholder-on-surface-variant/30 disabled:opacity-30 disabled:cursor-not-allowed"
-                />
-              </div>
-            </div>
-
-            {/* Input Group */}
-            <div className="space-y-1 relative group">
-              <label className="block font-technical-sm text-technical-sm text-primary uppercase tracking-widest" htmlFor="admin-pass">
-                Security Clearance
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10 text-[18px]">
-                  key
-                </span>
-                <input 
-                  type="password" 
-                  id="admin-pass" 
-                  name="admin-pass" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onFocus={() => handleFocus('password')}
-                  onBlur={handleBlur}
-                  disabled={isLocked}
-                  placeholder="••••••••" 
-                  className="w-full bg-surface-container-low/50 border border-outline-variant/50 text-primary font-technical-sm text-technical-sm py-2.5 pl-10 pr-4 rounded-none focus:ring-0 focus:border-secondary transition-all duration-300 glow-focus placeholder-on-surface-variant/30 disabled:opacity-30 disabled:cursor-not-allowed"
-                />
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="pt-1 flex flex-col space-y-3">
-              <button 
-                type="submit" 
-                disabled={loading || isLocked}
-                className="w-full bg-[#0070FF] text-white font-label-caps text-label-caps py-2.5 rounded-none tracking-widest hover:bg-[#005bb5] transition-all duration-300 glow-hover relative overflow-hidden group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span className="relative z-10 uppercase">
-                  {loading ? 'INITIALIZING HANDSHAKE...' : isLocked ? 'HANDSHAKE SUSPENDED' : 'INITIALIZE LOGIN'}
-                </span>
-                <div className="absolute inset-0 h-full w-0 bg-white/10 transition-all duration-300 ease-out group-hover:w-full z-0"></div>
-              </button>
-              
-              <div className="flex justify-center mt-3">
-                <Link 
-                  href="/" 
-                  className="font-technical-sm text-technical-sm text-on-surface-variant hover:text-secondary transition-colors inline-flex items-center gap-2 group"
-                >
-                  <span className="material-symbols-outlined text-[14px] group-hover:-translate-x-1 transition-transform">
-                    arrow_left_alt
-                  </span>
-                  Return to Main Interface
-                </Link>
-              </div>
-            </div>
           </form>
         </div>
       </div>

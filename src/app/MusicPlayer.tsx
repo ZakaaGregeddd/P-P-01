@@ -65,6 +65,87 @@ export default function MusicPlayer() {
   }, []);
 
   useEffect(() => {
+    let alarmOsc: OscillatorNode | null = null;
+    let alarmGain: GainNode | null = null;
+    let alarmInterval: any = null;
+    let alarmCtx: AudioContext | null = null;
+
+    const startAlarm = () => {
+      // Pause normal music
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+
+      try {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        alarmCtx = new AudioContextClass();
+        
+        const osc = alarmCtx.createOscillator();
+        const gain = alarmCtx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(650, alarmCtx.currentTime);
+        gain.gain.setValueAtTime(0, alarmCtx.currentTime);
+        
+        osc.connect(gain);
+        gain.connect(alarmCtx.destination);
+        osc.start();
+        
+        alarmOsc = osc;
+        alarmGain = gain;
+        
+        let isBeeping = false;
+        alarmInterval = setInterval(() => {
+          if (alarmCtx && gain) {
+            const now = alarmCtx.currentTime;
+            gain.gain.cancelScheduledValues(now);
+            if (isBeeping) {
+              gain.gain.setValueAtTime(0.025, now);
+              gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+            } else {
+              gain.gain.setValueAtTime(0, now);
+            }
+            isBeeping = !isBeeping;
+          }
+        }, 150);
+      } catch (e) {
+        console.debug('Failed to start synth alarm:', e);
+      }
+    };
+
+    const stopAlarm = () => {
+      if (alarmInterval) clearInterval(alarmInterval);
+      if (alarmOsc) {
+        try {
+          alarmOsc.stop();
+          alarmOsc.disconnect();
+        } catch(e){}
+        alarmOsc = null;
+      }
+      if (alarmCtx) {
+        try {
+          alarmCtx.close();
+        } catch(e){}
+        alarmCtx = null;
+      }
+      // Resume Cyberpunk music if it was playing
+      const shouldPlay = localStorage.getItem('music-playing') !== 'false';
+      if (shouldPlay && audioRef.current) {
+        audioRef.current.play().catch(() => {});
+      }
+    };
+
+    window.addEventListener('trigger-alarm', startAlarm);
+    window.addEventListener('stop-alarm', stopAlarm);
+
+    return () => {
+      if (alarmInterval) clearInterval(alarmInterval);
+      window.removeEventListener('trigger-alarm', startAlarm);
+      window.removeEventListener('stop-alarm', stopAlarm);
+    };
+  }, []);
+
+  useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
       localStorage.setItem('music-volume', volume.toString());

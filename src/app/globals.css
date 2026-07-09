@@ -162,7 +162,17 @@ body {
   stroke-dasharray: 100 300; /* Total cycle length is exactly 400 */
   animation: border-loading 4s linear infinite;
 }
+/* Critical Alarm Mode Styles */
+body.alarm-mode header,
+body.alarm-mode nav {
+  border-color: #ff3b30 !important;
+  box-shadow: 0 0 25px rgba(255, 59, 48, 0.6) !important;
+  text-shadow: 0 0 5px rgba(255, 59, 48, 0.5) !important;
+  transition: all 0.5s ease-in-out;
+}
 
-
-
-
+body.alarm-mode footer {
+  border-color: #ff3b30 !important;
+  box-shadow: 0 0 25px rgba(255, 59, 48, 0.6) !important;
+  transition: all 0.5s ease-in-out;
+}
