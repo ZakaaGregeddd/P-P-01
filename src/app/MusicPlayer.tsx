@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function MusicPlayer() {
+  const pathname = usePathname();
   const [isPlaying, setIsPlaying] = useState(true);
   const [volume, setVolume] = useState(0.15);
   const [isHovered, setIsHovered] = useState(false);
@@ -65,12 +67,24 @@ export default function MusicPlayer() {
   }, []);
 
   useEffect(() => {
+    // Redirect back to login if alarm is active and user tries to navigate elsewhere
+    if (typeof window === 'undefined') return;
+    const isAlarmActive = sessionStorage.getItem('alarm-active') === 'true';
+    if (isAlarmActive && pathname !== '/login') {
+      window.location.href = '/login';
+    }
+  }, [pathname]);
+
+  useEffect(() => {
     let alarmOsc: OscillatorNode | null = null;
     let alarmGain: GainNode | null = null;
     let alarmInterval: any = null;
     let alarmCtx: AudioContext | null = null;
 
     const startAlarm = () => {
+      // Persist active alarm state across page refreshes / navigations
+      sessionStorage.setItem('alarm-active', 'true');
+      
       // Pause normal music
       if (audioRef.current) {
         audioRef.current.pause();
@@ -114,6 +128,7 @@ export default function MusicPlayer() {
     };
 
     const stopAlarm = () => {
+      sessionStorage.removeItem('alarm-active');
       if (alarmInterval) clearInterval(alarmInterval);
       if (alarmOsc) {
         try {

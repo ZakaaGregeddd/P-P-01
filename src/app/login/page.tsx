@@ -151,8 +151,21 @@ export default function LoginPage() {
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
   const eyeContainerRef = useRef<HTMLDivElement>(null);
 
-  // Cleanup body class and stop alarm on unmount
+  // Cleanup body class and stop alarm on unmount + check active session alarm on mount
   useEffect(() => {
+    const isAlarmActive = typeof window !== 'undefined' && sessionStorage.getItem('alarm-active') === 'true';
+    if (isAlarmActive) {
+      setIsAlarmMode(true);
+      setEyeState('angry');
+      setAbortProgress(0);
+      setAlarmCountdown(15);
+      setError('CRITICAL BREACH: COGNITIVE OVERRIDE INITIATED');
+      document.body.classList.add('alarm-mode');
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('trigger-alarm'));
+      }, 150);
+    }
+
     return () => {
       document.body.classList.remove('alarm-mode');
       if (typeof window !== 'undefined') {
@@ -414,12 +427,17 @@ export default function LoginPage() {
 
   return (
     <div className="flex-grow flex items-center justify-center pt-2 pb-6 px-margin-mobile relative overflow-hidden min-h-[calc(100vh-180px)]">
+      {/* Full Screen Blocker Overlay */}
+      {isAlarmMode && (
+        <div className="fixed inset-0 bg-black/15 backdrop-blur-[1px] z-[9999] pointer-events-auto cursor-not-allowed"></div>
+      )}
+
       {/* Decorative Dimension Lines */}
       <div className="absolute left-1/4 top-1/4 w-32 h-[1px] bg-secondary/30 before:content-[''] before:absolute before:-top-[3px] before:-left-[1px] before:w-[1px] before:h-[7px] before:bg-secondary/50 after:content-[''] after:absolute after:-top-[3px] after:-right-[1px] after:w-[1px] after:h-[7px] after:bg-secondary/50 pointer-events-none"></div>
-      <div className="absolute right-1/4 bottom-1/4 w-[1px] h-32 bg-secondary/30 before:content-[''] before:absolute before:-left-[3px] before:-top-[1px] before:w-[7px] before:h-[1px] before:bg-secondary/50 after:content-[''] after:absolute after:-left-[3px] after:-bottom-[1px] after:w-[7px] after:h-[1px] after:bg-secondary/50 pointer-events-none"></div>
+      <div className="absolute right-1/4 bottom-1/4 w-[1px] h-32 bg-secondary/30 before:content-[''] before:absolute before:-left-[3px] before:-top-[1px] before:w-[7px] before:h-[1px] before:bg-secondary/50 after:content-[''] after:absolute after:-left-[3px] after:-bottom-[1px] after:w-[7px] after:h-[1px] before:bg-secondary/50 pointer-events-none"></div>
 
       {/* Login Card Container */}
-      <div className="w-full max-w-md z-10 my-2">
+      <div className={`w-full max-w-md my-2 ${isAlarmMode ? 'z-[10000]' : 'z-10'}`}>
         <div className={`glass-panel rounded-none py-5 px-6 shadow-2xl relative transition-all duration-500 ${isAlarmMode ? 'border-[#ff3b30] shadow-[0_0_35px_rgba(255,59,48,0.5)] animate-pulse' : ''}`}>
           
           {/* Minimal Windows Hello Style Eye Widget */}
