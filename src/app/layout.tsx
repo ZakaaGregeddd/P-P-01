@@ -60,7 +60,7 @@ export default async function RootLayout({
         <AdaptiveNavbar isLoggedIn={isLoggedIn} />
 
         {/* Content Canvas */}
-        <main className="flex-grow pt-20">
+        <main className="flex-grow pt-16">
           {children}
         </main>
 

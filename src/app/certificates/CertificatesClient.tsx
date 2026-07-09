@@ -154,7 +154,7 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div>
             <h2 className="font-label-caps text-label-caps text-secondary mb-2 tracking-[0.2em]">02 // CERTIFICATION_ARCHIVE</h2>
-            <p className="font-technical-sm text-technical-sm text-outline uppercase">Master Registry // Total Entries: {filteredCerts.length}</p>
+            <p className="font-technical-sm text-[10px] sm:text-technical-sm text-outline uppercase">Master Registry // Total Entries: {filteredCerts.length}</p>
           </div>
           
           {/* Technical Filter Bar */}
@@ -257,18 +257,19 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
         </div>
 
         {/* System Navigation */}
-        <div className="mt-12 flex justify-between items-center glass-panel p-4 border-l-0 border-r-0 border-b-0">
+        {/* System Navigation */}
+        <div className="mt-12 flex justify-between items-center glass-panel p-3 sm:p-4 border-l-0 border-r-0 border-b-0 gap-2">
           <button 
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            className="flex items-center gap-2 font-technical-sm text-outline hover:text-secondary disabled:opacity-30 disabled:hover:text-outline transition-colors group cursor-pointer"
+            className="flex items-center gap-1 sm:gap-2 font-technical-sm text-[10px] sm:text-xs text-outline hover:text-secondary disabled:opacity-30 disabled:hover:text-outline transition-colors group cursor-pointer"
           >
-            <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back_ios</span>
-            PREV_PAGE
+            <span className="material-symbols-outlined text-xs sm:text-sm group-hover:-translate-x-1 transition-transform">arrow_back_ios</span>
+            <span className="hidden sm:inline">PREV_PAGE</span>
           </button>
           
-          <div className="flex items-center gap-6 font-technical-sm text-outline">
-            <div className="flex gap-2">
+          <div className="flex items-center gap-2 sm:gap-6 font-technical-sm text-[10px] sm:text-xs text-outline">
+            <div className="flex gap-1.5 sm:gap-2">
               {Array.from({ length: totalPages }).map((_, i) => (
                 <span 
                   key={i}
@@ -280,16 +281,18 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
               ))}
             </div>
             <span className="opacity-30">//</span>
-            <span className="tracking-widest">PAGE_TOTAL_{String(totalPages).padStart(2, '0')}</span>
+            <span className="tracking-widest">
+              <span className="hidden sm:inline">PAGE_TOTAL_</span>{String(totalPages).padStart(2, '0')}
+            </span>
           </div>
           
           <button 
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            className="flex items-center gap-2 font-technical-sm text-outline hover:text-secondary disabled:opacity-30 disabled:hover:text-outline transition-colors group cursor-pointer"
+            className="flex items-center gap-1 sm:gap-2 font-technical-sm text-[10px] sm:text-xs text-outline hover:text-secondary disabled:opacity-30 disabled:hover:text-outline transition-colors group cursor-pointer"
           >
-            NEXT_PAGE
-            <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+            <span className="hidden sm:inline">NEXT_PAGE</span>
+            <span className="material-symbols-outlined text-xs sm:text-sm group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
           </button>
         </div>
       </section>

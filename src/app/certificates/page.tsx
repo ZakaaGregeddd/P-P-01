@@ -132,7 +132,7 @@ export default async function CertificatesPage() {
           <div>
             <h1 className="font-headline-md text-headline-md text-primary uppercase">Certification Repository</h1>
             <div className="dimension-line mt-2 mb-2 w-64"></div>
-            <p className="font-technical-sm text-technical-sm text-on-surface-variant uppercase tracking-widest">
+            <p className="font-technical-sm text-[10px] sm:text-technical-sm text-on-surface-variant uppercase tracking-widest">
               System Index: 004 // Verified Technical Credentials
             </p>
           </div>

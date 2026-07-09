@@ -48,7 +48,7 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
     <>
       {/* Extended State NavBar */}
       <header
-        className={`fixed top-0 left-0 w-full bg-surface/80 backdrop-blur-xl border-b border-secondary/20 shadow-[0_0_20px_rgba(86,141,255,0.15)] z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-20 transition-all duration-500 transform ${
+        className={`fixed top-0 left-0 w-full bg-surface/80 backdrop-blur-xl border-b border-secondary/20 shadow-[0_0_20px_rgba(86,141,255,0.15)] z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 transition-all duration-500 transform ${
           isExtended ? 'translate-y-0 opacity-100' : '-translate-y-24 opacity-0 pointer-events-none'
         }`}
       >
@@ -136,8 +136,8 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
       <div
         className={`fixed left-0 w-full bg-surface/95 backdrop-blur-2xl border-b border-secondary/20 shadow-[0_15px_30px_rgba(0,112,255,0.15)] z-40 transition-all duration-300 transform md:hidden ${
           isExtended && isMobileMenuOpen 
-            ? 'top-20 opacity-100 translate-y-0' 
-            : 'top-20 -translate-y-4 opacity-0 pointer-events-none'
+            ? 'top-16 opacity-100 translate-y-0' 
+            : 'top-16 -translate-y-4 opacity-0 pointer-events-none'
         }`}
       >
         <nav className="flex flex-col py-2">
