@@ -140,7 +140,9 @@ export default function CertificatesClient({ initialCerts }: CertificatesClientP
                   </p>
                   <div className="mt-auto pt-3.5 border-t border-outline-variant/30 flex justify-between font-technical-sm text-[10px] text-outline">
                     <span>VALIDATED: {formattedDate}{cert.fileSize ? ` // ${formatBytes(cert.fileSize)}` : ''}</span>
-                    <span className="text-secondary font-bold uppercase">{index === 0 ? 'RECENT_ENTRY' : index === 1 ? 'CORE_CREDENTIAL' : 'SYSTEMS_EXPERT'}</span>
+                    <span className="text-secondary font-bold uppercase">
+                      {cert.customLabel || (index === 0 ? 'RECENT_ENTRY' : index === 1 ? 'CORE_CREDENTIAL' : 'SYSTEMS_EXPERT')}
+                    </span>
                   </div>
                 </div>
               </article>

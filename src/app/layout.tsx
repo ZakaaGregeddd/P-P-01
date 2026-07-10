@@ -10,7 +10,7 @@ import BannedPortal from "./BannedPortal";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "GRD-Port v1.6",
+  title: "GRD-Port v1.7",
   description: "Crafting digital structures with mathematical precision and ethereal depth. A portfolio of high-fidelity prototypes, systems architectures, and interactive schematics.",
 };
 
@@ -73,7 +73,7 @@ export default async function RootLayout({
         {/* Footer */}
         <footer className="w-full py-4 bg-background border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop gap-2 z-10 relative">
           <div className="font-label-caps text-[9px] text-primary opacity-60 tracking-wider">
-            © 2026 SYSTEM_REDACTED. GRD-PORT SPECIFICATION V1.6
+            © 2026 SYSTEM_REDACTED. GRD-PORT SPECIFICATION V1.7
           </div>
           <div className="flex gap-4 font-technical-sm text-[10px] text-on-surface-variant">
             <Link href="#" className="hover:text-secondary opacity-75 hover:opacity-100 transition-opacity">Documentation</Link>

@@ -1,6 +1,6 @@
 'use server';
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { put, del } from '@vercel/blob';
 import { getCollection } from '@/lib/db';
@@ -50,6 +50,7 @@ export async function addCertificate(formData: FormData) {
   const status = formData.get('status') as 'active' | 'expired';
   const description = formData.get('description') as string || '';
   const file = formData.get('file') as File;
+  const customLabel = formData.get('customLabel') as string || '';
 
   if (!name || !issuer || !dateIssued || !credentialId) {
     return { success: false, error: 'All text fields are required' };
@@ -82,6 +83,7 @@ export async function addCertificate(formData: FormData) {
       fileUrl,
       fileSize,
       description,
+      customLabel,
       createdAt: new Date().toISOString(),
     });
 
@@ -134,7 +136,6 @@ export async function updateBiodata(formData: FormData) {
   const designation = formData.get('designation') as string;
   const specialization = formData.get('specialization') as string;
   const statement = formData.get('statement') as string;
-  const sysVer = formData.get('sysVer') as string;
   const status = formData.get('status') as string;
   const photoFile = formData.get('photoFile') as File | null;
   let photoUrl = formData.get('photoUrl') as string || '';
@@ -181,7 +182,6 @@ export async function updateBiodata(formData: FormData) {
           designation,
           specialization,
           statement,
-          sysVer,
           status,
           photoUrl,
           competencies: [
@@ -288,6 +288,7 @@ export async function updateCertificate(formData: FormData) {
   const description = formData.get('description') as string || '';
   const file = formData.get('file') as File | null;
   let fileUrl = formData.get('fileUrl') as string || '';
+  const customLabel = formData.get('customLabel') as string || '';
 
   if (!id || !name || !issuer || !dateIssued || !credentialId) {
     return { success: false, error: 'All text fields are required' };
@@ -340,6 +341,7 @@ export async function updateCertificate(formData: FormData) {
           fileUrl,
           fileSize,
           description,
+          customLabel,
           updatedAt: new Date().toISOString(),
         }
       }
@@ -350,6 +352,142 @@ export async function updateCertificate(formData: FormData) {
     return { success: true };
   } catch (err: any) {
     return { success: false, error: `Database update failed: ${err.message}` };
+  }
+}
+
+// Get Public Comments
+export async function getComments() {
+  try {
+    const collection = await getCollection('comments');
+    const comments = await collection
+      .find({})
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .toArray();
+
+    return comments.map(c => ({
+      id: c._id.toString(),
+      nickname: c.nickname,
+      text: c.text,
+      createdAt: c.createdAt instanceof Date ? c.createdAt.toISOString() : c.createdAt
+    }));
+  } catch (err) {
+    console.error('Failed to retrieve comments:', err);
+    return [];
+  }
+}
+
+// Post Public Comment
+export async function postComment(nickname: string, text: string) {
+  // Validate presence
+  if (!nickname || !text || !nickname.trim() || !text.trim()) {
+    return { success: false, error: 'Nickname and message cannot be empty.' };
+  }
+
+  // Escaping HTML characters to prevent XSS injection
+  const cleanNickname = nickname
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .trim()
+    .substring(0, 8); // Max length 8
+
+  const cleanText = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .trim()
+    .substring(0, 500); // Max length 500
+
+  try {
+    const headerList = await headers();
+    const ip = headerList.get('x-forwarded-for') || 'unknown-client-ip';
+
+    const collection = await getCollection('comments');
+
+    // Anti-spam Rate Limit: Check if this IP has posted in the last 15 seconds
+    const lastComment = await collection.findOne({
+      ip,
+      createdAt: { $gt: new Date(Date.now() - 15 * 1000) }
+    });
+
+    if (lastComment) {
+      return { success: false, error: 'Rate limit exceeded. Please wait 15 seconds before posting again.' };
+    }
+
+    // Insert comment with real Date object for automatic 3-month TTL index deletion
+    await collection.insertOne({
+      nickname: cleanNickname,
+      text: cleanText,
+      ip,
+      createdAt: new Date()
+    });
+
+    revalidatePath('/');
+    return { success: true };
+  } catch (err: any) {
+    console.error('Error posting comment:', err);
+    return { success: false, error: `Failed to submit comment: ${err.message}` };
+  }
+}
+
+// Get General Website Settings
+export async function getSettings() {
+  try {
+    const collection = await getCollection('settings');
+    const settings = await collection.findOne({ key: 'site_settings' });
+    return {
+      systemVersion: settings?.systemVersion || '4.2.0',
+      authProtocol: settings?.authProtocol || 'V.04',
+      isOverdriveOff: settings?.isOverdriveOff === true
+    };
+  } catch (err) {
+    console.error('Failed to get settings:', err);
+    return {
+      systemVersion: '4.2.0',
+      authProtocol: 'V.04',
+      isOverdriveOff: false
+    };
+  }
+}
+
+// Update General Website Settings
+export async function updateSettings(formData: FormData) {
+  const cookieStore = await cookies();
+  if (!cookieStore.has('admin_session')) {
+    throw new Error('Unauthorized');
+  }
+
+  const systemVersion = formData.get('systemVersion') as string || '4.2.0';
+  const authProtocol = formData.get('authProtocol') as string || 'V.04';
+  const isOverdriveOff = formData.get('isOverdriveOff') === 'true';
+
+  try {
+    const collection = await getCollection('settings');
+    await collection.updateOne(
+      { key: 'site_settings' },
+      {
+        $set: {
+          systemVersion,
+          authProtocol,
+          isOverdriveOff,
+          updatedAt: new Date().toISOString()
+        }
+      },
+      { upsert: true }
+    );
+
+    revalidatePath('/');
+    revalidatePath('/certificates');
+    revalidatePath('/admin');
+    revalidatePath('/login');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: `Failed to save configuration: ${err.message}` };
   }
 }
 

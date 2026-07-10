@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { login } from '../actions';
+import { login, getSettings } from '../actions';
 
 // Simple Windows Hello Style AI Eye
 function AiEye({
@@ -132,6 +132,15 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [authProtocol, setAuthProtocol] = useState('V.04');
+
+  useEffect(() => {
+    getSettings().then(cfg => {
+      if (cfg && cfg.authProtocol) {
+        setAuthProtocol(cfg.authProtocol);
+      }
+    });
+  }, []);
 
   // AI Eye States
   const [attempts, setAttempts] = useState(0);
@@ -480,7 +489,7 @@ export default function LoginPage() {
               {isAlarmMode ? 'SYSTEM THREAT' : 'System Access'}
             </h1>
             <p className={`font-technical-sm text-technical-sm uppercase tracking-widest ${isAlarmMode ? 'text-error' : 'text-on-surface-variant'}`}>
-              {isAlarmMode ? 'OVERRIDE STATE // INTRUSION' : 'Authentication Protocol // V.3.2'}
+              {isAlarmMode ? 'OVERRIDE STATE // INTRUSION' : `Authentication Protocol // ${authProtocol}`}
             </p>
           </div>
 

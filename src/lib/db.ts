@@ -35,7 +35,16 @@ export async function getDb() {
 }
 export async function getCollection(name: string) {
   const db = await getDb();
-  return db.collection(name);
+  const collection = db.collection(name);
+  if (name === 'comments') {
+    try {
+      // Automatically purge documents older than 90 days (3 months)
+      await collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 });
+    } catch (e) {
+      console.error('Failed to create comments TTL index:', e);
+    }
+  }
+  return collection;
 }
 export interface Certificate {
   _id?: string;
@@ -47,5 +56,6 @@ export interface Certificate {
   fileUrl: string;
   fileSize?: number;
   description?: string;
+  customLabel?: string;
   createdAt: string;
 }

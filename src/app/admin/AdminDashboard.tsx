@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { addCertificate, deleteCertificate, logout, updateBiodata, updateProject, updateCertificate } from '../actions';
+import { addCertificate, deleteCertificate, logout, updateBiodata, updateProject, updateCertificate, updateSettings } from '../actions';
 
 interface AdminCert {
   _id: string;
@@ -14,6 +14,13 @@ interface AdminCert {
   fileUrl: string;
   fileSize?: number;
   description?: string;
+  customLabel?: string;
+}
+
+interface AdminSettings {
+  systemVersion: string;
+  authProtocol: string;
+  isOverdriveOff: boolean;
 }
 
 interface AdminBiodata {
@@ -39,11 +46,13 @@ interface AdminProject {
 export default function AdminDashboard({ 
   initialCerts,
   initialBiodata,
-  initialProjects = []
+  initialProjects = [],
+  initialSettings
 }: { 
   initialCerts: AdminCert[];
   initialBiodata: AdminBiodata | null;
   initialProjects?: AdminProject[];
+  initialSettings?: AdminSettings;
 }) {
   const router = useRouter();
   const [name, setName] = useState('');
@@ -55,6 +64,7 @@ export default function AdminDashboard({
   const [file, setFile] = useState<File | null>(null);
   const [editingCertId, setEditingCertId] = useState<string | null>(null);
   const [editingFileUrl, setEditingFileUrl] = useState('');
+  const [customLabel, setCustomLabel] = useState('');
 
   const [loading, setLoading] = useState(false);
 
@@ -63,7 +73,6 @@ export default function AdminDashboard({
   const [bioDesignation, setBioDesignation] = useState(initialBiodata?.designation || 'Lead Architect // Systems Designer');
   const [bioSpecialization, setBioSpecialization] = useState(initialBiodata?.specialization || 'Computational Geometry & Structural Logic');
   const [bioStatement, setBioStatement] = useState(initialBiodata?.statement || 'Bridging the gap between speculative engineering and functional architecture through high-fidelity digital prototyping and mathematical precision.');
-  const [bioSysVer, setBioSysVer] = useState(initialBiodata?.sysVer || '4.2.0');
   const [bioStatus, setBioStatus] = useState(initialBiodata?.status || 'ONLINE');
   const [bioPhotoUrl, setBioPhotoUrl] = useState(initialBiodata?.photoUrl || '');
   const [bioPhotoFile, setBioPhotoFile] = useState<File | null>(null);
@@ -97,12 +106,42 @@ export default function AdminDashboard({
   const [proj2File, setProj2File] = useState<File | null>(null);
 
   const [projLoading, setProjLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'certificates'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'certificates' | 'settings'>('profile');
+
+  // General Settings states
+  const [sysVersion, setSysVersion] = useState(initialSettings?.systemVersion || '4.2.0');
+  const [authProtocol, setAuthProtocol] = useState(initialSettings?.authProtocol || 'V.04');
+  const [isOverdriveOff, setIsOverdriveOff] = useState(initialSettings?.isOverdriveOff || false);
+  const [settingsLoading, setSettingsLoading] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     router.push('/login');
     router.refresh();
+  };
+
+  const handleSettingsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSettingsLoading(true);
+
+    const formData = new FormData();
+    formData.append('systemVersion', sysVersion);
+    formData.append('authProtocol', authProtocol);
+    formData.append('isOverdriveOff', String(isOverdriveOff));
+
+    try {
+      const res = await updateSettings(formData);
+      if (res.success) {
+        alert('Global settings updated successfully.');
+        router.refresh();
+      } else {
+        alert(res.error || 'Failed to update configuration.');
+      }
+    } catch (err: any) {
+      alert(`Error: ${err.message}`);
+    } finally {
+      setSettingsLoading(false);
+    }
   };
 
   const handleProjectSubmit = async (e: React.FormEvent, projNum: 1 | 2) => {
@@ -174,6 +213,7 @@ export default function AdminDashboard({
     formData.append('credentialId', credentialId);
     formData.append('status', status);
     formData.append('description', description);
+    formData.append('customLabel', customLabel);
     if (file) {
       formData.append('file', file);
     }
@@ -197,6 +237,7 @@ export default function AdminDashboard({
         setStatus('active');
         setDescription('');
         setFile(null);
+        setCustomLabel('');
         setEditingCertId(null);
         setEditingFileUrl('');
         // Reset file input element manually
@@ -237,7 +278,6 @@ export default function AdminDashboard({
     formData.append('designation', bioDesignation);
     formData.append('specialization', bioSpecialization);
     formData.append('statement', bioStatement);
-    formData.append('sysVer', bioSysVer);
     formData.append('status', bioStatus);
     formData.append('photoUrl', bioPhotoUrl);
     if (bioPhotoFile) {
@@ -330,6 +370,18 @@ export default function AdminDashboard({
               <span className="material-symbols-outlined text-[18px]">workspace_premium</span>
               <span>CERTIFICATE_DATA</span>
             </button>
+
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`flex items-center gap-3 px-4 py-3 font-technical-sm text-technical-sm tracking-wider border transition-all cursor-pointer text-left uppercase whitespace-nowrap lg:whitespace-normal w-fit lg:w-full ${
+                activeTab === 'settings'
+                  ? 'bg-secondary/15 border-secondary text-primary glow-text font-bold'
+                  : 'bg-transparent border-transparent text-on-surface-variant hover:bg-surface-container/50 hover:text-primary'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">settings_accessibility</span>
+              <span>SYSTEM_SETTINGS</span>
+            </button>
           </aside>
 
           {/* Active Tab Panel */}
@@ -398,31 +450,17 @@ export default function AdminDashboard({
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="font-label-caps text-label-caps text-on-surface-variant block">
-                        SYSTEM_VERSION
-                      </label>
-                      <input 
-                        type="text" 
-                        value={bioSysVer}
-                        onChange={(e) => setBioSysVer(e.target.value)}
-                        className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
-                        placeholder="4.2.0"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="font-label-caps text-label-caps text-on-surface-variant block">
-                        STATUS
-                      </label>
-                      <input 
-                        type="text" 
-                        value={bioStatus}
-                        onChange={(e) => setBioStatus(e.target.value)}
-                        className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
-                        placeholder="ONLINE"
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                      STATUS
+                    </label>
+                    <input 
+                      type="text" 
+                      value={bioStatus}
+                      onChange={(e) => setBioStatus(e.target.value)}
+                      className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
+                      placeholder="ONLINE"
+                    />
                   </div>
 
                   {/* Profile Photo */}
@@ -812,6 +850,19 @@ export default function AdminDashboard({
                           placeholder="ID-XXXX-YYYY" 
                         />
                       </div>
+
+                      <div className="space-y-2">
+                        <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                          CUSTOM_LABEL (OPTIONAL)
+                        </label>
+                        <input 
+                          type="text" 
+                          value={customLabel}
+                          onChange={(e) => setCustomLabel(e.target.value)}
+                          className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
+                          placeholder="e.g. CORE_CREDENTIAL (or blank for default)" 
+                        />
+                      </div>
                       
                       <div className="space-y-2">
                         <label className="font-label-caps text-label-caps text-on-surface-variant block">
@@ -936,6 +987,7 @@ export default function AdminDashboard({
                                         setStatus(cert.status);
                                         setDescription(cert.description || '');
                                         setEditingFileUrl(cert.fileUrl);
+                                        setCustomLabel(cert.customLabel || '');
                                         
                                         // Optional: scroll form into view for mobile users
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -968,6 +1020,71 @@ export default function AdminDashboard({
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'settings' && (
+              <div className="max-w-4xl glass-panel rounded-lg p-4 sm:p-6 glow-effect transition-all duration-300">
+                <div className="flex items-center justify-between mb-6 border-b border-outline/30 pb-4 relative z-10">
+                  <h2 className="font-technical-sm text-technical-sm text-primary tracking-wider">
+                    SYSTEM_CONFIG // GENERAL_SETTINGS
+                  </h2>
+                  <span className="material-symbols-outlined text-secondary text-sm">settings</span>
+                </div>
+                
+                <form onSubmit={handleSettingsSubmit} className="space-y-6 relative z-10">
+                  <div className="space-y-2">
+                    <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                      SYSTEM_VERSION
+                    </label>
+                    <input 
+                      type="text" 
+                      value={sysVersion}
+                      onChange={(e) => setSysVersion(e.target.value)}
+                      className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
+                      placeholder="e.g. 4.2.0"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                      AUTHENTICATION_PROTOCOL_VERSION
+                    </label>
+                    <input 
+                      type="text" 
+                      value={authProtocol}
+                      onChange={(e) => setAuthProtocol(e.target.value)}
+                      className="w-full bg-surface-container/50 border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all" 
+                      placeholder="e.g. V.04"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="font-label-caps text-label-caps text-on-surface-variant block">
+                      WEBSITE_OVERDRIVE_STATUS (PUBLIC ACCESS)
+                    </label>
+                    <select 
+                      value={isOverdriveOff ? 'off' : 'on'}
+                      onChange={(e) => setIsOverdriveOff(e.target.value === 'off')}
+                      className="w-full bg-[#0d0d0d] border border-outline/50 rounded text-body-base text-primary p-3 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 blueprint-grid transition-all cursor-pointer font-technical-sm"
+                    >
+                      <option value="on">ON // PUBLIC ACCESS ACTIVE</option>
+                      <option value="off">OFF // RESTRICTED STANDBY MODE (OFFLINE EXCEPT LOGIN/ADMIN)</option>
+                    </select>
+                  </div>
+
+                  <div className="pt-4 border-t border-outline/30 flex justify-end">
+                    <button 
+                      type="submit" 
+                      disabled={settingsLoading}
+                      className="font-technical-sm text-technical-sm text-surface bg-secondary px-6 py-2 rounded hover:shadow-[0_0_15px_rgba(176,198,255,0.5)] transition-all font-bold cursor-pointer disabled:opacity-50"
+                    >
+                      {settingsLoading ? 'COMMITING CONFIG...' : 'COMMIT_SYSTEM_CONFIG'}
+                    </button>
+                  </div>
+                </form>
               </div>
             )}
           </div>

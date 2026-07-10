@@ -57,7 +57,7 @@ export default function AdaptiveNavbar({ isLoggedIn }: { isLoggedIn: boolean }) 
             href="/" 
             className="font-headline-md text-2xl text-primary tracking-tighter hover:opacity-85 transition-opacity whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px] sm:max-w-none"
           >
-            <span className="hidden sm:inline">GRD-Port v1.6</span>
+            <span className="hidden sm:inline">GRD-Port v1.7</span>
             <span className="inline sm:hidden">GRD</span>
           </Link>
           <nav className="hidden md:flex gap-8">

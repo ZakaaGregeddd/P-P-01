@@ -1,9 +1,20 @@
 import { getCollection, Certificate } from '@/lib/db';
 import CertificatesClient from './CertificatesClient';
+import OfflineScreen from '../OfflineScreen';
+import { getSettings } from '../actions';
 
 export const revalidate = 0; // Disable cache so it fetches fresh certificates on reload
 
 export default async function CertificatesPage() {
+  const settings = await getSettings();
+  if (settings.isOverdriveOff) {
+    return (
+      <div className="pt-16 pb-16 px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto relative z-10 min-h-[80vh] flex flex-col justify-center">
+        <OfflineScreen />
+      </div>
+    );
+  }
+
   let certificates: Certificate[] = [];
   try {
     const collection = await getCollection('certificates');
@@ -16,6 +27,7 @@ export default async function CertificatesPage() {
         status: 1,
         fileUrl: 1,
         description: 1,
+        customLabel: 1,
         createdAt: 1
       })
       .sort({ dateIssued: -1 })
@@ -31,6 +43,7 @@ export default async function CertificatesPage() {
       status: doc.status || 'active',
       fileUrl: doc.fileUrl || '',
       description: doc.description || '',
+      customLabel: doc.customLabel || '',
       createdAt: doc.createdAt || new Date().toISOString(),
     }));
   } catch (err) {

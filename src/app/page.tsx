@@ -4,6 +4,9 @@ import WelcomeLava from "./WelcomeLava";
 import { getCollection } from "@/lib/db";
 import InteractiveCard from "./InteractiveCard";
 import YouTubeGrid from "./YouTubeGrid";
+import CommentSection from "./CommentSection";
+import OfflineScreen from "./OfflineScreen";
+import { getComments, getSettings } from "./actions";
 
 async function getLatestYoutubeVideos() {
   const fallbackVideos = [
@@ -76,6 +79,19 @@ async function getLatestYoutubeVideos() {
 }
 
 export default async function Home() {
+  const settings = await getSettings();
+
+  if (settings.isOverdriveOff) {
+    return (
+      <div className="relative w-full overflow-hidden">
+        <WelcomeLava />
+        <div className="pt-16 pb-16 px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto relative z-10 flex flex-col justify-center min-h-[80vh]">
+          <OfflineScreen />
+        </div>
+      </div>
+    );
+  }
+
   let bio: any = null;
   try {
     const collection = await getCollection('biodata');
@@ -89,7 +105,7 @@ export default async function Home() {
   const designation = bio?.designation || "Lead Architect // Systems Designer";
   const specialization = bio?.specialization || "Computational Geometry & Structural Logic";
   const statement = bio?.statement || "Bridging the gap between speculative engineering and functional architecture through high-fidelity digital prototyping and mathematical precision.";
-  const sysVer = bio?.sysVer || "4.2.0";
+  const sysVer = settings.systemVersion;
   const status = bio?.status || "ONLINE";
   const photoUrl = bio?.photoUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuBvgbA9HjgJL9iojhLKW5pRErIqn0pxb1IR0mWXv3fAIBEGuBHvgPYeqq4mNoC_Uu97GyrwDhUThRS_CN-skLS9scv3DcviaeJKSvJM9d52gtn_qWyVYOD77YFd-rciIEWMUif30ROOovXKBmUE6EzNvE7vG7mJjJlL6H2a-nn9lFB7Sfk_6KxPd-IpKuqLLXGgaEh7mlp4rHQHjidws1W_sG4D7Iwl4j6WWeC4GdfwLV2vU40yrPo";
 
@@ -116,6 +132,7 @@ export default async function Home() {
   }
 
   const youtubeVideos = await getLatestYoutubeVideos();
+  const comments = await getComments();
 
   return (
     <div className="relative w-full overflow-hidden">
@@ -335,6 +352,16 @@ export default async function Home() {
           </div>
 
           <YouTubeGrid videos={youtubeVideos} />
+        </section>
+
+        {/* Public Comments Node Section */}
+        <section className="flex flex-col gap-12 mt-16 mb-8">
+          <div className="flex justify-between items-end border-b border-outline-variant/30 pb-4">
+            <h2 className="font-headline-md text-headline-md text-primary tracking-tight">PUBLIC COMMENT NODE</h2>
+            <div className="font-technical-sm text-[12px] sm:text-technical-sm text-secondary">PORT // 80 // LOG_STREAM</div>
+          </div>
+
+          <CommentSection initialComments={comments} />
         </section>
       </div>
     </div>

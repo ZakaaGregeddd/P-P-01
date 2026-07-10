@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getCollection } from '@/lib/db';
 import AdminDashboard from './AdminDashboard';
+import { getSettings } from '../actions';
 
 export const revalidate = 0; // Disable caching
 
@@ -26,6 +27,7 @@ export default async function AdminPage() {
         fileUrl: 1,
         fileSize: 1,
         description: 1,
+        customLabel: 1,
         createdAt: 1
       })
       .sort({ dateIssued: -1 })
@@ -44,6 +46,7 @@ export default async function AdminPage() {
     fileUrl: cert.fileUrl || '',
     fileSize: cert.fileSize || 0,
     description: cert.description || '',
+    customLabel: cert.customLabel || '',
   }));
 
   let initialBiodata = null;
@@ -82,11 +85,14 @@ export default async function AdminPage() {
     console.error('Failed to load admin projects list:', err);
   }
 
+  const initialSettings = await getSettings();
+
   return (
     <AdminDashboard 
       initialCerts={initialCerts} 
       initialBiodata={initialBiodata} 
       initialProjects={initialProjects} 
+      initialSettings={initialSettings}
     />
   );
 }
