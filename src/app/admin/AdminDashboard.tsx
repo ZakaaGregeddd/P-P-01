@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { addCertificate, deleteCertificate, logout, updateBiodata, updateProject } from '../actions';
+import { addCertificate, deleteCertificate, logout, updateBiodata, updateProject, updateCertificate } from '../actions';
 
 interface AdminCert {
   _id: string;
@@ -13,6 +13,7 @@ interface AdminCert {
   status: 'active' | 'expired';
   fileUrl: string;
   fileSize?: number;
+  description?: string;
 }
 
 interface AdminBiodata {
@@ -52,10 +53,10 @@ export default function AdminDashboard({
   const [status, setStatus] = useState<'active' | 'expired'>('active');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [editingCertId, setEditingCertId] = useState<string | null>(null);
+  const [editingFileUrl, setEditingFileUrl] = useState('');
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   // Biodata state
   const [bioName, setBioName] = useState(initialBiodata?.name || 'J. DOE');
@@ -76,8 +77,6 @@ export default function AdminDashboard({
   const [comp3Value, setComp3Value] = useState(initialBiodata?.competencies?.[2]?.value || 91);
 
   const [bioLoading, setBioLoading] = useState(false);
-  const [bioError, setBioError] = useState('');
-  const [bioSuccess, setBioSuccess] = useState('');
 
   // Projects states
   const proj1 = initialProjects.find(p => p.projectId === 'proj-1');
@@ -98,8 +97,6 @@ export default function AdminDashboard({
   const [proj2File, setProj2File] = useState<File | null>(null);
 
   const [projLoading, setProjLoading] = useState(false);
-  const [projError, setProjError] = useState('');
-  const [projSuccess, setProjSuccess] = useState('');
   const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'certificates'>('profile');
 
   const handleLogout = async () => {
@@ -110,8 +107,6 @@ export default function AdminDashboard({
 
   const handleProjectSubmit = async (e: React.FormEvent, projNum: 1 | 2) => {
     e.preventDefault();
-    setProjError('');
-    setProjSuccess('');
     setProjLoading(true);
 
     const formData = new FormData();
@@ -139,7 +134,7 @@ export default function AdminDashboard({
     try {
       const res = await updateProject(formData);
       if (res.success) {
-        setProjSuccess(`Project ${projNum} updated successfully.`);
+        alert(`Project ${projNum} updated successfully.`);
         if (projNum === 1) {
           setProj1File(null);
         } else {
@@ -147,10 +142,10 @@ export default function AdminDashboard({
         }
         router.refresh();
       } else {
-        setProjError(res.error || 'Failed to update project.');
+        alert(res.error || 'Failed to update project.');
       }
     } catch (err: any) {
-      setProjError(`Error: ${err.message}`);
+      alert(`Error: ${err.message}`);
     } finally {
       setProjLoading(false);
     }
@@ -164,12 +159,10 @@ export default function AdminDashboard({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
     setLoading(true);
 
     if (!name || !issuer || !dateIssued || !credentialId) {
-      setError('Please fill in all text fields.');
+      alert('Please fill in all text fields.');
       setLoading(false);
       return;
     }
@@ -186,9 +179,17 @@ export default function AdminDashboard({
     }
 
     try {
-      const res = await addCertificate(formData);
+      let res;
+      if (editingCertId) {
+        formData.append('id', editingCertId);
+        formData.append('fileUrl', editingFileUrl);
+        res = await updateCertificate(formData);
+      } else {
+        res = await addCertificate(formData);
+      }
+
       if (res.success) {
-        setSuccess('Certificate recorded and saved successfully.');
+        alert(editingCertId ? 'Certificate updated successfully.' : 'Certificate recorded and saved successfully.');
         setName('');
         setIssuer('');
         setDateIssued('');
@@ -196,15 +197,17 @@ export default function AdminDashboard({
         setStatus('active');
         setDescription('');
         setFile(null);
+        setEditingCertId(null);
+        setEditingFileUrl('');
         // Reset file input element manually
         const fileInput = document.getElementById('asset-upload') as HTMLInputElement;
         if (fileInput) fileInput.value = '';
         router.refresh();
       } else {
-        setError(res.error || 'Failed to add certificate.');
+        alert(res.error || `Failed to ${editingCertId ? 'update' : 'add'} certificate.`);
       }
     } catch (err: any) {
-      setError(`Error: ${err.message}`);
+      alert(`Error: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -227,8 +230,6 @@ export default function AdminDashboard({
 
   const handleBioSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setBioError('');
-    setBioSuccess('');
     setBioLoading(true);
 
     const formData = new FormData();
@@ -252,14 +253,14 @@ export default function AdminDashboard({
     try {
       const res = await updateBiodata(formData);
       if (res.success) {
-        setBioSuccess('Biodata updated successfully.');
+        alert('Biodata updated successfully.');
         setBioPhotoFile(null);
         router.refresh();
       } else {
-        setBioError(res.error || 'Failed to update biodata.');
+        alert(res.error || 'Failed to update biodata.');
       }
     } catch (err: any) {
-      setBioError(`Error: ${err.message}`);
+      alert(`Error: ${err.message}`);
     } finally {
       setBioLoading(false);
     }
@@ -343,16 +344,7 @@ export default function AdminDashboard({
                 </div>
                 
                 <form onSubmit={handleBioSubmit} className="space-y-6 relative z-10">
-                  {bioError && (
-                    <div className="border border-error/50 bg-error/10 text-error p-3 rounded text-technical-sm font-technical-sm tracking-wider uppercase text-center">
-                      ERROR: {bioError}
-                    </div>
-                  )}
-                  {bioSuccess && (
-                    <div className="border border-secondary/50 bg-secondary/10 text-secondary p-3 rounded text-technical-sm font-technical-sm tracking-wider uppercase text-center">
-                      SUCCESS: {bioSuccess}
-                    </div>
-                  )}
+
 
                   <div className="space-y-2">
                     <label className="font-label-caps text-label-caps text-on-surface-variant block">
@@ -546,16 +538,7 @@ export default function AdminDashboard({
                   </h2>
                 </header>
 
-                {projError && (
-                  <div className="border border-error/50 bg-error/10 text-error p-3 rounded text-technical-sm font-technical-sm tracking-wider uppercase text-center">
-                    ERROR: {projError}
-                  </div>
-                )}
-                {projSuccess && (
-                  <div className="border border-secondary/50 bg-secondary/10 text-secondary p-3 rounded text-technical-sm font-technical-sm tracking-wider uppercase text-center">
-                    SUCCESS: {projSuccess}
-                  </div>
-                )}
+
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
                   {/* PROJ 1 Form */}
@@ -754,22 +737,15 @@ export default function AdminDashboard({
                   <div className="glass-panel rounded-lg p-4 sm:p-6 glow-effect transition-all duration-300">
                     <div className="flex items-center justify-between mb-6 border-b border-outline/30 pb-4 relative z-10">
                       <h2 className="font-technical-sm text-technical-sm text-primary tracking-wider">
-                        INPUT_NODE // ADD_CERT
+                        {editingCertId ? 'CONFIG_NODE // EDIT_CERT' : 'INPUT_NODE // ADD_CERT'}
                       </h2>
-                      <span className="material-symbols-outlined text-secondary text-sm">add_circle</span>
+                      <span className="material-symbols-outlined text-secondary text-sm">
+                        {editingCertId ? 'edit_document' : 'add_circle'}
+                      </span>
                     </div>
                     
                     <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-                      {error && (
-                        <div className="border border-error/50 bg-error/10 text-error p-3 rounded text-technical-sm font-technical-sm tracking-wider uppercase text-center">
-                          ERROR: {error}
-                        </div>
-                      )}
-                      {success && (
-                        <div className="border border-secondary/50 bg-secondary/10 text-secondary p-3 rounded text-technical-sm font-technical-sm tracking-wider uppercase text-center">
-                          SUCCESS: {success}
-                        </div>
-                      )}
+
 
                       <div className="space-y-2">
                         <label className="font-label-caps text-label-caps text-on-surface-variant block">
@@ -882,17 +858,19 @@ export default function AdminDashboard({
                             setCredentialId('');
                             setDescription('');
                             setFile(null);
+                            setEditingCertId(null);
+                            setEditingFileUrl('');
                           }}
                           className="font-technical-sm text-technical-sm text-on-surface-variant px-4 py-2 border border-outline/50 rounded hover:text-primary hover:border-primary transition-all cursor-pointer"
                         >
-                          RESET
+                          {editingCertId ? 'CANCEL_EDIT' : 'RESET'}
                         </button>
                         <button 
                           type="submit" 
                           disabled={loading}
                           className="font-technical-sm text-technical-sm text-surface bg-secondary px-6 py-2 rounded hover:shadow-[0_0_15px_rgba(176,198,255,0.5)] transition-all font-bold cursor-pointer disabled:opacity-50"
                         >
-                          {loading ? 'EXECUTING...' : 'EXECUTE_SAVE'}
+                          {loading ? 'EXECUTING...' : (editingCertId ? 'EXECUTE_UPDATE' : 'EXECUTE_SAVE')}
                         </button>
                       </div>
                     </form>
@@ -949,8 +927,28 @@ export default function AdminDashboard({
                                 <td className="p-4 text-right">
                                   <div className="flex justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
                                     <button 
+                                      onClick={() => {
+                                        setEditingCertId(cert._id);
+                                        setName(cert.name);
+                                        setIssuer(cert.issuer);
+                                        setDateIssued(cert.dateIssued);
+                                        setCredentialId(cert.credentialId);
+                                        setStatus(cert.status);
+                                        setDescription(cert.description || '');
+                                        setEditingFileUrl(cert.fileUrl);
+                                        
+                                        // Optional: scroll form into view for mobile users
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                      }}
+                                      className="p-1 hover:text-secondary transition-colors cursor-pointer"
+                                      title="Edit Certificate"
+                                    >
+                                      <span className="material-symbols-outlined text-[16px]">edit</span>
+                                    </button>
+                                    <button 
                                       onClick={() => handleDelete(cert._id)}
                                       className="p-1 hover:text-error transition-colors cursor-pointer"
+                                      title="Delete Certificate"
                                     >
                                       <span className="material-symbols-outlined text-[16px]">delete</span>
                                     </button>

@@ -149,6 +149,17 @@ export async function updateBiodata(formData: FormData) {
 
   if (photoFile && photoFile.size > 0) {
     try {
+      // Delete old photo from Vercel Blob to avoid storage junk
+      try {
+        const collection = await getCollection('biodata');
+        const existingBio = await collection.findOne({ key: 'admin_biodata' });
+        if (existingBio && existingBio.photoUrl) {
+          await del(existingBio.photoUrl);
+        }
+      } catch (e) {
+        console.error('Failed to delete old biodata photo:', e);
+      }
+
       // Upload file to Vercel Blob
       const blob = await put(photoFile.name, photoFile, {
         access: 'public',
@@ -214,6 +225,17 @@ export async function updateProject(formData: FormData) {
 
     if (imageFile && typeof imageFile !== 'string' && 'size' in imageFile && (imageFile as any).size > 0) {
       try {
+        // Delete old image from Vercel Blob if it exists to avoid storage junk
+        try {
+          const collection = await getCollection('projects');
+          const existingProj = await collection.findOne({ projectId });
+          if (existingProj && existingProj.imageUrl) {
+            await del(existingProj.imageUrl);
+          }
+        } catch (e) {
+          console.error('Failed to delete old project image:', e);
+        }
+
         const fileObj = imageFile as File;
         const blob = await put(fileObj.name, fileObj, {
           access: 'public',
@@ -247,6 +269,87 @@ export async function updateProject(formData: FormData) {
   } catch (err: any) {
     console.error('Error in updateProject server action:', err);
     return { success: false, error: err.message || 'An unexpected server error occurred.' };
+  }
+}
+
+// Update Certificate
+export async function updateCertificate(formData: FormData) {
+  const cookieStore = await cookies();
+  if (!cookieStore.has('admin_session')) {
+    throw new Error('Unauthorized');
+  }
+
+  const id = formData.get('id') as string;
+  const name = formData.get('name') as string;
+  const issuer = formData.get('issuer') as string;
+  const dateIssued = formData.get('dateIssued') as string;
+  const credentialId = formData.get('credentialId') as string;
+  const status = formData.get('status') as 'active' | 'expired';
+  const description = formData.get('description') as string || '';
+  const file = formData.get('file') as File | null;
+  let fileUrl = formData.get('fileUrl') as string || '';
+
+  if (!id || !name || !issuer || !dateIssued || !credentialId) {
+    return { success: false, error: 'All text fields are required' };
+  }
+
+  try {
+    const collection = await getCollection('certificates');
+    const existingCert = await collection.findOne({ _id: new ObjectId(id) });
+    if (!existingCert) {
+      return { success: false, error: 'Certificate record not found' };
+    }
+
+    let fileSize = existingCert.fileSize || 0;
+    
+    if (file && file.size > 0) {
+      try {
+        fileSize = file.size;
+        // Delete old file from Vercel Blob if it exists to avoid storage junk
+        if (existingCert.fileUrl) {
+          try {
+            await del(existingCert.fileUrl);
+          } catch (e) {
+            console.error('Failed to delete old certificate blob:', e);
+          }
+        }
+        
+        // Upload new file to Vercel Blob
+        const blob = await put(file.name, file, {
+          access: 'public',
+          addRandomSuffix: true,
+        });
+        fileUrl = blob.url;
+      } catch (err: any) {
+        return { success: false, error: `File upload failed: ${err.message}` };
+      }
+    } else {
+      // Keep existing URL if no new file is uploaded
+      fileUrl = fileUrl || existingCert.fileUrl || '';
+    }
+
+    await collection.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          name,
+          issuer,
+          dateIssued,
+          credentialId,
+          status: status || 'active',
+          fileUrl,
+          fileSize,
+          description,
+          updatedAt: new Date().toISOString(),
+        }
+      }
+    );
+
+    revalidatePath('/certificates');
+    revalidatePath('/admin');
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: `Database update failed: ${err.message}` };
   }
 }
 
