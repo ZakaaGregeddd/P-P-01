@@ -19,9 +19,20 @@ export default function LavaBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -1000, y: -1000, vx: 0, vy: 0, lastX: 0, lastY: 0, active: false });
   const [isClient, setIsClient] = useState(false);
+  const [ecoMode, setEcoMode] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
+    // Initial fetch of eco mode
+    const isEco = localStorage.getItem('eco_mode') === 'true';
+    setEcoMode(isEco);
+
+    // Listen for global performance updates from GlobalLoader
+    const handleEcoChange = () => {
+      setEcoMode(localStorage.getItem('eco_mode') === 'true');
+    };
+    window.addEventListener('ecoModeChanged', handleEcoChange);
+    return () => window.removeEventListener('ecoModeChanged', handleEcoChange);
   }, []);
 
   useEffect(() => {
@@ -35,15 +46,27 @@ export default function LavaBackground() {
 
     let animationFrameId: number;
     const parent = canvas.parentElement;
-    // Stretch to cover the full body height of the document
-    let width = canvas.width = document.body.clientWidth || window.innerWidth;
-    let height = canvas.height = document.body.clientHeight || window.innerHeight;
+
+    // Eco Mode resolution scaling factors
+    const SCALE = ecoMode ? 0.25 : 0.5;
+
+    let width = document.body.clientWidth || window.innerWidth;
+    let height = document.body.clientHeight || window.innerHeight;
+
+    const setupCanvas = () => {
+      canvas.width = Math.floor(width * SCALE);
+      canvas.height = Math.floor(height * SCALE);
+      ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+    };
+
+    setupCanvas();
 
     // Resize handler
     const handleResize = () => {
       if (!canvas) return;
-      width = canvas.width = document.body.clientWidth;
-      height = canvas.height = document.body.clientHeight;
+      width = document.body.clientWidth;
+      height = document.body.clientHeight;
+      setupCanvas();
     };
     window.addEventListener('resize', handleResize);
 
@@ -113,7 +136,7 @@ export default function LavaBackground() {
 
     // Initialize blobs
     const blobs: Blob[] = [];
-    const numBlobs = 24; // dense background population
+    const numBlobs = ecoMode ? 10 : 22; // dense background population
 
     for (let i = 0; i < numBlobs; i++) {
       blobs.push(createRandomBlob(true));
@@ -287,7 +310,7 @@ export default function LavaBackground() {
       resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isClient]);
+  }, [isClient, ecoMode]);
 
   return (
     <div 

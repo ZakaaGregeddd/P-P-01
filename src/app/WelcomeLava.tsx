@@ -44,7 +44,7 @@ export default function WelcomeLava() {
       let currentText = '';
       for (let i = 0; i < scrollStr.length; i++) {
         const correctChar = scrollStr[i];
-        
+
         // Flicker a few random characters at the current typing position first
         const scrambleSteps = 3 + Math.floor(Math.random() * 3); // 3 to 5 steps
         for (let j = 0; j < scrambleSteps; j++) {
@@ -79,7 +79,7 @@ export default function WelcomeLava() {
       currentText = '';
       for (let i = 0; i < welcomeStr.length; i++) {
         const correctChar = welcomeStr[i];
-        
+
         // Flicker random characters
         const scrambleSteps = 3 + Math.floor(Math.random() * 3);
         for (let j = 0; j < scrambleSteps; j++) {
@@ -204,7 +204,7 @@ export default function WelcomeLava() {
           <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-primary/40"></div>
           <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-primary/40"></div>
 
-          <h1 
+          <h1
             style={glitchStyle}
             className="font-display-lg text-primary text-4xl sm:text-5xl md:text-[80px] lg:text-[100px] font-bold uppercase tracking-widest leading-none drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] min-h-[1em]"
           >
@@ -213,7 +213,7 @@ export default function WelcomeLava() {
         </div>
 
         {/* Scroll Chevron */}
-        <button 
+        <button
           onClick={scrollToHero}
           className="mt-6 flex flex-col items-center justify-center text-secondary/60 hover:text-secondary transition-colors cursor-pointer group focus:outline-none"
           aria-label="Scroll to main content"

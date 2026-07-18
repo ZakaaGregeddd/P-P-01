@@ -5,8 +5,9 @@ import AdaptiveNavbar from "./AdaptiveNavbar";
 import LavaBackground from "./LavaBackground";
 import GlobalLoader from "./GlobalLoader";
 import MusicPlayer from "./MusicPlayer";
-import EnergyGridBackground from "./EnergyGridBackground";
+import KineticGridBackground from "./KineticGridBackground";
 import BannedPortal from "./BannedPortal";
+import MouseEffects from "./MouseEffects";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -40,48 +41,51 @@ export default async function RootLayout({
         {/* Global Floating Background Music Player */}
         <MusicPlayer />
 
+        {/* Global GSAP Click Burst Effects */}
+        <MouseEffects color="#0070FF" interactionMode="burst" />
+
+        {/* Global Interactive Kinetic Grid Background */}
+        <KineticGridBackground />
+
         {/* Global Lava Lamp Background Animation */}
         <LavaBackground />
 
-        {/* Global Ambient Breathing Energy Grid Lines Overlay */}
-        <EnergyGridBackground />
-
-        {/* Grid Overlay Guide (Development/Aesthetic) */}
-        <div className="fixed inset-0 pointer-events-none z-0 hidden md:flex justify-between px-margin-desktop opacity-[0.03]">
-          <div className="w-full h-full border-x border-primary"></div>
-          <div className="w-full h-full border-r border-primary"></div>
-          <div className="w-full h-full border-r border-primary"></div>
-          <div className="w-full h-full border-r border-primary"></div>
-          <div className="w-full h-full border-r border-primary"></div>
-          <div className="w-full h-full border-r border-primary"></div>
-          <div className="w-full h-full border-r border-primary"></div>
-          <div className="w-full h-full border-r border-primary"></div>
-          <div className="w-full h-full border-r border-primary"></div>
-          <div className="w-full h-full border-r border-primary"></div>
-          <div className="w-full h-full border-r border-primary"></div>
-          <div className="w-full h-full border-r border-primary"></div>
-        </div>
-
-        {/* Adaptive NavBar */}
-        <AdaptiveNavbar isLoggedIn={isLoggedIn} />
-
-        {/* Content Canvas */}
-        <main className="flex-grow pt-16">
-          {children}
-        </main>
-
-        {/* Footer */}
-        <footer className="w-full py-4 bg-background border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop gap-2 z-10 relative">
-          <div className="font-label-caps text-[9px] text-primary opacity-60 tracking-wider">
-            © 2026 SYSTEM_REDACTED. GRD-PORT SPECIFICATION V1.7
+          {/* Grid Overlay Guide (Development/Aesthetic) */}
+          <div className="fixed inset-0 pointer-events-none z-0 hidden md:flex justify-between px-margin-desktop opacity-[0.03]">
+            <div className="w-full h-full border-x border-primary"></div>
+            <div className="w-full h-full border-r border-primary"></div>
+            <div className="w-full h-full border-r border-primary"></div>
+            <div className="w-full h-full border-r border-primary"></div>
+            <div className="w-full h-full border-r border-primary"></div>
+            <div className="w-full h-full border-r border-primary"></div>
+            <div className="w-full h-full border-r border-primary"></div>
+            <div className="w-full h-full border-r border-primary"></div>
+            <div className="w-full h-full border-r border-primary"></div>
+            <div className="w-full h-full border-r border-primary"></div>
+            <div className="w-full h-full border-r border-primary"></div>
+            <div className="w-full h-full border-r border-primary"></div>
           </div>
-          <div className="flex gap-4 font-technical-sm text-[10px] text-on-surface-variant">
-            <Link href="#" className="hover:text-secondary opacity-75 hover:opacity-100 transition-opacity">Documentation</Link>
-            <Link href="#" className="hover:text-secondary opacity-75 hover:opacity-100 transition-opacity">Source</Link>
-            <Link href="#" className="hover:text-secondary opacity-75 hover:opacity-100 transition-opacity">Privacy</Link>
-          </div>
-        </footer>
-      </BannedPortal>
+
+          {/* Adaptive NavBar */}
+          <AdaptiveNavbar isLoggedIn={isLoggedIn} />
+
+          {/* Content Canvas */}
+          <main className="flex-grow pt-16">
+            {children}
+          </main>
+
+          {/* Footer */}
+          <footer className="w-full py-4 bg-background border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop gap-2 z-10 relative">
+            <div className="font-label-caps text-[9px] text-primary opacity-60 tracking-wider">
+              © 2026 SYSTEM_REDACTED. GRD-PORT SPECIFICATION V1.7
+            </div>
+            <div className="flex gap-4 font-technical-sm text-[10px] text-on-surface-variant">
+              <Link href="#" className="hover:text-secondary opacity-75 hover:opacity-100 transition-opacity">Documentation</Link>
+              <Link href="#" className="hover:text-secondary opacity-75 hover:opacity-100 transition-opacity">Source</Link>
+              <Link href="#" className="hover:text-secondary opacity-75 hover:opacity-100 transition-opacity">Privacy</Link>
+            </div>
+          </footer>
+        </BannedPortal>
       </body>
     </html>
   );
