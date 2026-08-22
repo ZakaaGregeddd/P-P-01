@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { addCertificate, deleteCertificate, logout, updateBiodata, updateProject, updateCertificate, updateSettings } from '../actions';
+import ImageCropperModal from './ImageCropperModal';
 
 interface AdminCert {
   _id: string;
@@ -104,6 +105,10 @@ export default function AdminDashboard({
   const [proj2Link, setProj2Link] = useState(proj2?.linkUrl || '/projects/void-terminal');
   const [proj2ImgUrl, setProj2ImgUrl] = useState(proj2?.imageUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuBsGpYQQnihiuoyOEwkpyV5zE_C-BoPuC1KONYQ7LMwYSCTI2o8bPwosHPejqCGQ2PCCcxfTpQXUtdLrpAMdQBsO-KPBg4S6Dmo9K63mC2YbYkTFss57VB_2bYDpvK7RBb9dreqUBn9VD-f91FqiBVdSTHIwnH-b7uZU6T0o92d62Wqmhvv6tLQnTWfUvalZRa_qkoFsa4niweyaxHn6KMAxnlx63_Zulkt8AqX_x7YsjXSbwDJo5g');
   const [proj2File, setProj2File] = useState<File | null>(null);
+
+  // Cropper states
+  const [cropFile, setCropFile] = useState<File | null>(null);
+  const [croppingProject, setCroppingProject] = useState<1 | 2 | null>(null);
 
   const [projLoading, setProjLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'certificates' | 'settings'>('profile');
@@ -638,7 +643,8 @@ export default function AdminDashboard({
                               accept=".png,.jpg,.jpeg"
                               onChange={(e) => {
                                 if (e.target.files && e.target.files[0]) {
-                                  setProj1File(e.target.files[0]);
+                                  setCropFile(e.target.files[0]);
+                                  setCroppingProject(1);
                                 }
                               }}
                               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -731,7 +737,8 @@ export default function AdminDashboard({
                               accept=".png,.jpg,.jpeg"
                               onChange={(e) => {
                                 if (e.target.files && e.target.files[0]) {
-                                  setProj2File(e.target.files[0]);
+                                  setCropFile(e.target.files[0]);
+                                  setCroppingProject(2);
                                 }
                               }}
                               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -1090,6 +1097,26 @@ export default function AdminDashboard({
           </div>
         </div>
       </main>
+
+      {/* Custom Image Cropper Modal */}
+      {croppingProject && cropFile && (
+        <ImageCropperModal
+          file={cropFile}
+          onCrop={(croppedFile) => {
+            if (croppingProject === 1) {
+              setProj1File(croppedFile);
+            } else {
+              setProj2File(croppedFile);
+            }
+            setCropFile(null);
+            setCroppingProject(null);
+          }}
+          onClose={() => {
+            setCropFile(null);
+            setCroppingProject(null);
+          }}
+        />
+      )}
     </div>
   );
 }
