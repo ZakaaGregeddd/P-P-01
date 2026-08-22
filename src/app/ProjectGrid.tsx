@@ -88,6 +88,8 @@ export default function ProjectGrid({
       <Link
         href={proj1.linkUrl}
         data-id="proj-1"
+        target={proj1.linkUrl.startsWith('http') || proj1.linkUrl.startsWith('//') ? "_blank" : undefined}
+        rel={proj1.linkUrl.startsWith('http') || proj1.linkUrl.startsWith('//') ? "noopener noreferrer" : undefined}
         onMouseEnter={() => playElectricSparkSound()}
         className={`glass-panel p-6 glow-hover group flex flex-col justify-between min-h-[400px] transition-all duration-[800ms] ease-out transform relative block ${
           visibleItems['proj-1']
@@ -130,6 +132,8 @@ export default function ProjectGrid({
       <Link
         href={proj2.linkUrl}
         data-id="proj-2"
+        target={proj2.linkUrl.startsWith('http') || proj2.linkUrl.startsWith('//') ? "_blank" : undefined}
+        rel={proj2.linkUrl.startsWith('http') || proj2.linkUrl.startsWith('//') ? "noopener noreferrer" : undefined}
         onMouseEnter={() => {
           playElectricSparkSound();
           setIsProj2Hovered(true);
